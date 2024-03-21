@@ -1,0 +1,35 @@
+.picker {
+  width: 300px;
+  background: #f0f0f4;
+  border-radius: 9px;
+}
+
+.picker .react-colorful {
+  width: auto;
+}
+
+.picker__swatches {
+  display: flex;
+  padding: 12px;
+  flex-wrap: wrap;
+}
+
+.picker__swatch {
+  width: 24px;
+  height: 24px;
+  margin: 4px;
+  border: none;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+}
+
+
+.popover {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  border-radius: 9px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
