@@ -15,17 +15,13 @@ const SidebarComponet = ({ Componets }) => {
         {/* Navbar */}
         <Navbar />
       </div>
-
-      {/* SideBar */}
       <div style={{ display: "flex" }}>
         <Sidebar
           collapsed={collapsed}
           backgroundColor={"white"}
-          rootStyles={
-            {
-              minHeight: "100vh",
-            }
-          }
+          rootStyles={{
+            minHeight: "100vh",
+          }}
         >
           <div className="d-flex justify-content-center p-4">
             <img src="/assets/images/brand/logo/logo-2.svg" />
@@ -77,15 +73,9 @@ const SidebarComponet = ({ Componets }) => {
             </SubMenu>
             <SubMenu
               label="Setting"
-              icon={
-                <IconPack
-                  icon={"setting"}
-                  
-                />
-              }
+              icon={<IconPack icon={"setting"} />}
               className={`${
-                ["/theme"].includes(location.pathname) &&
-                "fw-bold text-primary"
+                ["/theme"].includes(location.pathname) && "fw-bold text-primary"
               }`}
             >
               <MenuItem

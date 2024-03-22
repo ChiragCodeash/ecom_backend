@@ -31,7 +31,7 @@ const CreateProduct = () => {
   useEffect(() => {
     GetCategory();
     // console.log(typeof(paramValue))
-    if (paramValue &&  typeof(paramValue) == "number") {
+    if (paramValue && typeof paramValue == "number") {
       const fetch = async () => {
         const { pc_id, product_title, product_desc, pack_of, ideal_for } =
           await getSingalProduct(paramValue);
@@ -45,7 +45,7 @@ const CreateProduct = () => {
         setValue(product_desc);
       };
       fetch();
-    }else{
+    } else {
       navigate("/addproduct");
     }
   }, []);

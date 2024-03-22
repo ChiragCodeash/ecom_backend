@@ -15,11 +15,12 @@ const ProductState = ({ children }) => {
     pack_of: "",
   });
   const [varient, setVarient] = useState({
-    size_id: "",
+    size_id: [],
     color_id: "",
   });
 
   const handleVarientForm = (e) => {
+    // console.log(e.target.value)
     setVarient({ ...varient, [e.target.name]: e.target.value });
   };
 
@@ -94,7 +95,7 @@ const ProductState = ({ children }) => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      console.log("🚀 ~ createVariant ~ result:", result);
+      // console.log("🚀 ~ createVariant ~ result:", result);
       if (result.status) {
         navigate(
           `/addproduct/createvariant?variant_id=${result.variant_id}&product_id=${data.product_id}`
