@@ -11,7 +11,6 @@ import Page404 from "./componets/pages/Page404";
 import TagInput from "./componets/common/TagInput";
 import Test from "./Test";
 import Loading from "./componets/common/Loading";
-import CreateVariantUI from "./componets/Product/CreateVariantUI";
 
 const App = () => {
   const navigate = useNavigate();
@@ -96,7 +95,6 @@ const App = () => {
           path="/resetpass"
           element={<ResetPass title="Reset Password" />}
         />
-        <Route path="/test" element={<CreateVariantUI />} />
         <Route path="*" element={<Page404 title="Page not Found" />} />
       </Routes>
     </>

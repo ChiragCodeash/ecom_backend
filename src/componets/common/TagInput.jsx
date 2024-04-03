@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Tagify from "@yaireo/tagify";
 import "@yaireo/tagify/dist/tagify.css";
 
-const TagInput = ({ className, placeholder , tagifyObject , value , data  }) => {
+const TagInput = ({ className, placeholder , tagifyObject , value , name  }) => {
   // console.log("🚀 ~ TagInput ~ tagifyObject:", tagifyObject)
   // const [value, setValue] = useState([]);
   const tagifyRef = useRef(null);
@@ -33,6 +33,7 @@ const TagInput = ({ className, placeholder , tagifyObject , value , data  }) => 
         ref={tagifyRef}
         className={className}
         placeholder={placeholder}
+        name={name}
       />
       {/* <button onClick={() => console.log(value)}>Show</button> */}
     </div>

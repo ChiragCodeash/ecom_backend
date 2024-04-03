@@ -22,6 +22,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CategoryIcon from '@mui/icons-material/Category';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 
 
 const IconPack = ({ icon, size }) => {
@@ -162,6 +163,12 @@ const IconPack = ({ icon, size }) => {
       return (
         <>
           <DeleteIcon fontSize={size || "medium"} />
+        </>
+      );
+    case "add":
+      return (
+        <>
+          <AddIcon fontSize={size || "medium"} />
         </>
       );
 

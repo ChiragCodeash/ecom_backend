@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import IconPack from "../common/IconPack";
 import { FieldRequiredValidation, TitleValidation } from "../../Validation";
-import CreateVariantUI from "./CreateVariantUI";
+// import CreateVariantUI from "./CreateVariantUI";
 
 const CreateProduct = () => {
   const location = useLocation();
@@ -31,7 +31,8 @@ const CreateProduct = () => {
   useEffect(() => {
     GetCategory();
     // console.log(typeof(paramValue))
-    if (paramValue && typeof paramValue == "number") {
+    if ( paramValue) {
+      
       const fetch = async () => {
         const { pc_id, product_title, product_desc, pack_of, ideal_for } =
           await getSingalProduct(paramValue);
@@ -181,6 +182,7 @@ const CreateProduct = () => {
                       name="pack_of"
                       onChange={handleForm}
                       value={CreateProductData.pack_of}
+                      
                     >
                       <option value={""}>Select pack of</option>
                       <option value={"1"}>1</option>

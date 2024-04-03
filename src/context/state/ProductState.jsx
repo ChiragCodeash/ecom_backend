@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ProductContext } from "../CreateContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import $ from "jquery";
 
 const ProductState = ({ children }) => {
   const url = `${import.meta.env.VITE_APP_SERVER_URL}/product`;
@@ -15,12 +16,13 @@ const ProductState = ({ children }) => {
     pack_of: "",
   });
   const [varient, setVarient] = useState({
-    size_id: [],
+    size_id: "",
     color_id: "",
   });
 
   const handleVarientForm = (e) => {
     // console.log(e.target.value)
+    $(e.target).removeClass("error-input");
     setVarient({ ...varient, [e.target.name]: e.target.value });
   };
 
@@ -55,22 +57,25 @@ const ProductState = ({ children }) => {
   };
 
   // Get All Varient
-  const getAllVariant = async (product_id) => {
+  const getAllVariant = async (product_id , color_id) => {
     try {
       const response = await fetch(
-        `${url}/getallvarient?product_id=${product_id}`,
+        `${url}/getallvarient`,
         {
-          method: "GET",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             token: localStorage.getItem("token"),
           },
+          body: JSON.stringify({product_id , color_id}),
         }
       );
       const result = await response.json();
       if (result.status) {
         setVariantObj(result.data);
-        navigate(`/addproduct/createvariant?variant_id=${result.data[result.data.length - 1].variant_id}&product_id=${product_id}`)
+        // navigate(`/addproduct/createvariant?variant_id=${result.data[result.data.length - 1].variant_id}&product_id=${product_id}`)
+        navigate(`/addproduct/createvariant?product_id=${product_id}`)
+        return result.data
       }else{
         setVariantObj()
         navigate(`/addproduct/createvariant?product_id=${product_id}`)
@@ -98,9 +103,13 @@ const ProductState = ({ children }) => {
       // console.log("🚀 ~ createVariant ~ result:", result);
       if (result.status) {
         navigate(
-          `/addproduct/createvariant?variant_id=${result.variant_id}&product_id=${data.product_id}`
+          // `/addproduct/createvariant?variant_id=${result.variant_id}&product_id=${data.product_id}`
+          `/addproduct/createvariant?product_id=${data.product_id}`
         );
         getAllVariant(data.product_id);
+        toast.success("New varinat added", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       } else {
         toast.error(result.message, {
           position: toast.POSITION.TOP_RIGHT,
@@ -211,6 +220,7 @@ const ProductState = ({ children }) => {
     setCreateProductData,
     createVariant,
     varientObj,
+    setVariantObj,
     getAllVariant,
     updateProduct,
     getSingalProduct,
