@@ -32,9 +32,8 @@ const DropZone = ({ files, setFiles }) => {
   const thumbs = files.map((file, i) => (
     <div
       key={i}
-      //   name={`color` + i}
       className="btn btn-light  btn-icon mt-3"
-      style={{ height: "144px", width: "144px" }}
+      style={{ height: "100px", width: "100px" }}
     >
       <div
         className="position-absolute rounded bg-danger-soft img-preview-close"
@@ -55,10 +54,17 @@ const DropZone = ({ files, setFiles }) => {
   ));
   return (
     <>
-      <section className="">
-        <div {...getRootProps({ className: "dropzone" })}>
+      <section>
+        <div
+          {...getRootProps({
+            className:
+              "align-items-center d-flex dropzone justify-content-center",
+          })}
+        >
           <input {...getInputProps()} />
-          <p>Drag and drop some files here, or click to select files</p>
+          <p className="m-0">
+            Drag and drop some files here, or click to select files
+          </p>
         </div>
         <aside className="d-flex gap-3 flex-wrap">{thumbs}</aside>
       </section>

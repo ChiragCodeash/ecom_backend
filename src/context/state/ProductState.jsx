@@ -3,6 +3,7 @@ import { ProductContext } from "../CreateContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import $ from "jquery";
+import { flushSync } from "react-dom";
 
 const ProductState = ({ children }) => {
   const url = `${import.meta.env.VITE_APP_SERVER_URL}/product`;
@@ -106,17 +107,21 @@ const ProductState = ({ children }) => {
           // `/addproduct/createvariant?variant_id=${result.variant_id}&product_id=${data.product_id}`
           `/addproduct/createvariant?product_id=${data.product_id}`
         );
-        getAllVariant(data.product_id);
+        // console.log(data)
+        // getAllVariant(data.product_id , data.color_id);
         toast.success("New varinat added", {
           position: toast.POSITION.TOP_RIGHT,
         });
+        return true
       } else {
         toast.error(result.message, {
           position: toast.POSITION.TOP_RIGHT,
         });
+        return false
       }
     } catch (error) {
       console.log(error);
+      return false
     }
   };
 
@@ -200,17 +205,20 @@ const ProductState = ({ children }) => {
         toast.success(result.message, {
           position: toast.POSITION.TOP_RIGHT,
         });
-        getAllVariant(product_id);
+        // getAllVariant(product_id);
+        return true
       } else {
         toast.error(result.message, {
           position: toast.POSITION.TOP_RIGHT,
         });
+        return false
       }
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
         position: toast.POSITION.TOP_RIGHT,
       });
+      return false
     }
   };
 

@@ -11,6 +11,7 @@ import Page404 from "./componets/pages/Page404";
 import TagInput from "./componets/common/TagInput";
 import Test from "./Test";
 import Loading from "./componets/common/Loading";
+import ImageGallery from "./Test";
 
 const App = () => {
   const navigate = useNavigate();
@@ -94,6 +95,11 @@ const App = () => {
           exact
           path="/resetpass"
           element={<ResetPass title="Reset Password" />}
+        />
+        <Route
+          exact
+          path="/test"
+          element={<ImageGallery title="Reset Password" />}
         />
         <Route path="*" element={<Page404 title="Page not Found" />} />
       </Routes>

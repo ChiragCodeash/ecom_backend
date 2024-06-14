@@ -1,6 +1,6 @@
 import Dashboard from "./componets/Dashboard";
 import AddProductLayout from "./componets/Product/AddProductLayout";
-import AddVarient from "./componets/Product/AddVarient";
+import AddVarient from "./componets/Product/AddVariant";
 import CreateProduct from "./componets/Product/CreateProduct";
 // import SelectCategory from "./componets/Product/SelectCategory";
 import ViewProduct from "./componets/Product/ViewProduct";

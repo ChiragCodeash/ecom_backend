@@ -1,7 +1,8 @@
 import React, { Children, useState } from "react";
 import { ColorAndSizeContext } from "../CreateContext";
+import { toast } from "react-toastify";
 
-const ColorAndSizeState = ({children}) => {
+const ColorAndSizeState = ({ children }) => {
   const [productColor, setProductColor] = useState();
   const [productSize, setProductSize] = useState();
   const [sizeAndColor, setSizeAndColor] = useState();
@@ -68,6 +69,72 @@ const ColorAndSizeState = ({children}) => {
     }
   };
 
+  const addColor = async (colors) => {
+    try {
+      const response = await fetch(`${url}/addcolor`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ colors }),
+      });
+      const result = await response.json();
+
+      if (result.status) {
+        setSizeAndColor({ size: sizeAndColor.size, color: result.data });
+        toast.success(result.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        return true;
+      } else {
+        toast.error(result.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        return false;
+      }
+    } catch (error) {
+      console.log("Error fetching data:", error.message);
+      toast.error("Internal server error", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      return false;
+    }
+  };
+
+  const addSize = async (sizes) => {
+    try {
+      const response = await fetch(`${url}/addsize`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ sizes }),
+      });
+      const result = await response.json();
+
+      if (result.status) {
+        setSizeAndColor({ color: sizeAndColor.color, size: result.data });
+        toast.success(result.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        return true;
+      } else {
+        toast.error(result.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        return false;
+      }
+    } catch (error) {
+      console.log("Error fetching data:", error.message);
+      toast.error("Internal server error", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      return false;
+    }
+  };
+
   const DefaultObj = {
     getColor,
     productColor,
@@ -75,6 +142,7 @@ const ColorAndSizeState = ({children}) => {
     productSize,
     getColorAndSize,
     sizeAndColor,
+    addColor,addSize
   };
   return (
     <ColorAndSizeContext.Provider value={DefaultObj}>

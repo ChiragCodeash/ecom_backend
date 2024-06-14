@@ -1,27 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
 import Tagify from "@yaireo/tagify";
 import "@yaireo/tagify/dist/tagify.css";
+import $ from "jquery";
 
-const TagInput = ({ className, placeholder , tagifyObject , value , name  }) => {
+const TagInput = ({ className, placeholder, tagifyObject, value, name ,id }) => {
   // console.log("🚀 ~ TagInput ~ tagifyObject:", tagifyObject)
   // const [value, setValue] = useState([]);
   const tagifyRef = useRef(null);
 
   useEffect(() => {
     const tagify = new Tagify(tagifyRef.current, {
-     ...tagifyObject,
-    //  whitelist: ["one","two","three"]
+      ...tagifyObject,
     });
 
     tagify.on("add", (e) => {
-      // console.log(e.detail)
       value.push(e.detail.data.value);
+      $(`.tagify`).removeClass("error-input");
     });
 
     tagify.on("remove", (e) => {
       let indexToRemove = value.indexOf(e.detail.data.value);
       value.splice(indexToRemove, 1);
     });
+    
 
     return () => {
       tagify.destroy();
@@ -34,6 +35,7 @@ const TagInput = ({ className, placeholder , tagifyObject , value , name  }) => 
         className={className}
         placeholder={placeholder}
         name={name}
+        id={id}
       />
       {/* <button onClick={() => console.log(value)}>Show</button> */}
     </div>

@@ -30,7 +30,7 @@ const CustomeModal = ({
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={onSubmit}>
+          <Button variant="primary" id="modalSubmitBtn" onClick={onSubmit}>
             Save Changes
           </Button>
         </Modal.Footer>
