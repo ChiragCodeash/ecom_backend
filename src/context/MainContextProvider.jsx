@@ -6,6 +6,7 @@ import ProductCategoryState from "./state/ProductCategoryState";
 import ProductState from "./state/ProductState";
 import SizeState from "./state/SizeState";
 import ColorAndSizeState from "./state/ColorAndSizeState";
+import ImageState from "./state/ImageState";
 
 const MainContextProvider = ({ children }) => {
   return (
@@ -14,11 +15,11 @@ const MainContextProvider = ({ children }) => {
         <AuthState>
           <ProductCategoryState>
             <ProductState>
-             
+              <ImageState>
                 <SizeState>
                   <ColorAndSizeState>{children}</ColorAndSizeState>
                 </SizeState>
-             
+              </ImageState>
             </ProductState>
           </ProductCategoryState>
         </AuthState>

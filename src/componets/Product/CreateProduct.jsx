@@ -191,71 +191,24 @@ const CreateProduct = () => {
                       <option value={"4"}>4</option>
                     </select>
                   </div>
+                 
                   <div className="mb-3 col-md-6">
-                    <label className="form-label" id="productSKU">
-                      Ideal for
-                    </label>
-                    <br />
-                    <div className="form-check form-check-inline">
-                      <input
-                        // className="form-check-input"
-                        className={`form-check-input ${
-                          isValidate == "Ideal" && "error-input"
-                        }`}
-                        type="radio"
-                        name="ideal_for"
-                        id="inlineRadio1"
-                        value={"male"}
-                        onChange={handleForm}
-                        checked={CreateProductData.ideal_for == "male"}
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="inlineRadio1"
-                      >
-                        Male
-                      </label>
-                    </div>
-                    {/* input */}
-                    <div className="form-check form-check-inline">
-                      <input
-                        className={`form-check-input ${
-                          isValidate == "Ideal" && "error-input"
-                        }`}
-                        type="radio"
-                        name="ideal_for"
-                        value={"female"}
-                        onChange={handleForm}
-                        id="inlineRadio2"
-                        checked={CreateProductData.ideal_for == "female"}
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="inlineRadio2"
-                      >
-                        Female
-                      </label>
-                    </div>
-                    {/* input */}
-                    <div className="form-check form-check-inline">
-                      <input
-                        className={`form-check-input ${
-                          isValidate == "Ideal" && "error-input"
-                        }`}
-                        type="radio"
-                        name="ideal_for"
-                        id="inlineRadio3"
-                        value={"kids"}
-                        onChange={handleForm}
-                        checked={CreateProductData.ideal_for == "kids"}
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="inlineRadio3"
-                      >
-                        Kids
-                      </label>
-                    </div>
+                    <label className="form-label">Ideal For</label>
+                    <select
+                      className={`form-select ${
+                        isValidate == "Ideal" && "error-input"
+                      }`}
+                      aria-label="Default select example"
+                      name="ideal_for"
+                      onChange={handleForm}
+                      value={CreateProductData.ideal_for}
+                      
+                    >
+                      <option value={""}>Select Ideal</option>
+                      <option value={"male"}>Male</option>
+                      <option value={"female"}>female</option>
+                      <option value={"kids"}>Kids</option>
+                    </select>
                   </div>
                 </div>
 

@@ -1,4 +1,4 @@
-import React, { useDebugValue, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import {
   ColorAndSizeContext,
+  ImageContext,
   ProductContext,
 } from "../../context/CreateContext";
 import CustomeModal from "../common/CustomeModal";
@@ -35,6 +36,7 @@ const AddVarient = () => {
     useContext(ProductContext).Variant;
   const { getColorAndSize, sizeAndColor, addColor, addSize } =
     useContext(ColorAndSizeContext);
+  const { addImage, deleteImage, updateImage } = useContext(ImageContext);
 
   // State --------------
   const [variantData, setVatiantData] = useState([]);
@@ -42,6 +44,7 @@ const AddVarient = () => {
   const [images, setImages] = useState([]);
   const [value, setValue] = useState();
   const [files, setFiles] = useState([]);
+  const [updateIndex, setUpdateIndex] = useState();
 
   const [newSize, setNewSize] = useState([]);
   const [newColor, setNewColor] = useState([]);
@@ -49,6 +52,7 @@ const AddVarient = () => {
   const [sizeModal, setSizeModal] = useState(false);
   const [colorModal, setColorModal] = useState(false);
   const [imageModal, setImageModal] = useState(false);
+  const [updateImageModal, setUpdateImageModal] = useState(false);
 
   // Modal ------------------
   const handleClose = () => {
@@ -60,7 +64,11 @@ const AddVarient = () => {
   };
   const handleImageClose = () => {
     setImageModal(false);
-    setNewSize([]);
+    setFiles([]);
+  };
+  const handleUpdateImageClose = () => {
+    setUpdateImageModal(false);
+    setFiles([]);
   };
 
   const handleVariantData = (e, variant_id, index) => {
@@ -81,8 +89,8 @@ const AddVarient = () => {
       .replace(/(\..*?)\..*/g, "$1")
       .slice(0, number || 5);
   };
-  const validation = (e) => {
-    e.preventDefault();
+  const validation = () => {
+    // e.preventDefault();
 
     var msg;
     for (let index = 0; index < variantData.length; index++) {
@@ -98,7 +106,7 @@ const AddVarient = () => {
         msg = "Sale price name is required";
         break;
       }
-      if (element.sku_name == null || element.sku_name.length === 0) {
+      if (element.sku_id == null || element.sku_id.length === 0) {
         $(`#sku_id_${index}`).addClass("error-input");
         msg = "SKU ID name is required";
         break;
@@ -115,8 +123,8 @@ const AddVarient = () => {
     e.preventDefault();
     const msg = validation(e);
     // console.log(msg);
-    if (msg) {
-      toast.error(msg, {
+    if (msg || images.length == 0) {
+      toast.error("Please complate this variant first", {
         position: toast.POSITION.TOP_RIGHT,
       });
     } else {
@@ -173,7 +181,7 @@ const AddVarient = () => {
         });
         if (status) {
           const data = await getAllVariant(product_id, varient.color_id);
-          setValue(varient.color_id.toString());
+          // setValue(varient.color_id.toString());
           setVatiantData(data.variants);
           setColorIds(data.color);
           setImages(data.images);
@@ -215,17 +223,24 @@ const AddVarient = () => {
 
   // Handle Tab  ------------------
   const handleChange = (event, newValue) => {
-    const fetch = async () => {
-      const data = await getAllVariant(product_id, newValue);
-      setVatiantData(data.variants);
-      setColorIds(data.color);
-      setImages(data.images);
-      console.log(images)
-    };
-    fetch();
-    setValue(newValue);
-    setVarient({ ...varient, color_id: newValue });
-    $(".error-input").removeClass("error-input");
+    console.log(variantData)
+    
+    if (!validation() && images.length != 0) {
+      const fetch = async () => {
+        const data = await getAllVariant(product_id, newValue);
+        setVatiantData(data.variants);
+        setColorIds(data.color);
+        setImages(data.images);
+      };
+      fetch();
+      setValue(newValue);
+      setVarient({ ...varient, color_id: newValue });
+      $(".error-input").removeClass("error-input");
+    } else {
+      toast.error("Please complate this variant first", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
   };
 
   // Add New Sizes -----------------
@@ -266,8 +281,99 @@ const AddVarient = () => {
       }
     }
   };
-  const submitNewImages = () => {
-    console.log(files);
+  const submitNewImages = async () => {
+    $("#modalSubmitBtn").text("Loading...").addClass("disabled");
+    if (files.length) {
+      if (files.length <= 5) {
+        const data = new FormData();
+        data.append("product_id", product_id);
+        data.append("color_id", value);
+        files.map((file) => {
+          data.append("files", file);
+        });
+        const result = await addImage(data);
+        if (result.status) {
+          setImages(result.data);
+          setFiles([]);
+          setImageModal(false);
+          toast.success(result.message, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        } else {
+          toast.error(result.message, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        }
+      } else {
+        toast.error("You can add upto 5 images", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      }
+    } else {
+      toast.error("Images are required", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    $("#modalSubmitBtn").text("Save Changes");
+  };
+
+  const HandleDeleteImage = async (index) => {
+    const { image_id } = images;
+
+    const result = await deleteImage({ image_id, index });
+    if (result.status) {
+      setImages((prev) => {
+        if (prev.image_array.length > 1) {
+          prev.image_array.splice(index, 1);
+          return { ...prev, image_array: prev.image_array };
+        } else {
+          return [];
+        }
+      });
+
+      toast.success(result.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    } else {
+      toast.error(result.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+  };
+
+  const submitUpdateImage = async () => {
+    $("#modalSubmitBtn").text("Loading...").addClass("disabled");
+    if (files.length) {
+      const { image_id } = images;
+
+      const data = new FormData();
+      data.append("image_id", image_id);
+      data.append("index", updateIndex);
+      files.map((file) => {
+        data.append("image", file);
+      });
+      const result = await updateImage(data);
+      if (result.status) {
+        setImages((prev) => {
+          prev.image_array.splice(updateIndex, 1, result.data.filename);
+          return { ...prev, image_array: prev.image_array };
+        });
+        setFiles([]);
+        setUpdateImageModal(false);
+        toast.success(result.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      } else {
+        toast.error(result.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      }
+    } else {
+      toast.error("Images are required", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    $("#modalSubmitBtn").text("Save Changes");
   };
   return (
     <>
@@ -366,32 +472,33 @@ const AddVarient = () => {
           )}
         </div>
         {variantData.length ? (
-          <div className="card mb-4">
-            <Box sx={{ width: "100%", typography: "body1" }}>
-              <TabContext value={value}>
-                <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                  <TabList
-                    onChange={handleChange}
-                    aria-label="lab API tabs example"
-                  >
-                    {colorIds.map((item, i) => {
-                      return (
-                        <Tab
-                          key={i}
-                          label={item.color_name}
-                          value={item.color_id.toString()}
-                          // value={i.toString()}
-                        />
-                      );
-                    })}
-                  </TabList>
-                </Box>
+          <>
+            <div className="card mb-4">
+              <Box sx={{ width: "100%", typography: "body1" }}>
+                <TabContext value={value}>
+                  <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                    <TabList
+                      onChange={handleChange}
+                      aria-label="lab API tabs example"
+                    >
+                      {colorIds.map((item, i) => {
+                        return (
+                          <Tab
+                            key={i}
+                            label={item.color_name}
+                            value={item.color_id.toString()}
+                            // value={i.toString()}
+                          />
+                        );
+                      })}
+                    </TabList>
+                  </Box>
 
-                <TabPanel value={value} className="p-0">
-                  <div>
-                    <div className="border-0 card-header p-0">
-                      <div className="card-header d-lg-flex justify-content-between ">
-                        <div className="d-grid d-lg-block">
+                  <TabPanel value={value} className="p-0">
+                    <div>
+                      <div className="border-0 card-header p-0">
+                        {/* <div className="card-header d-lg-flex justify-content-between "> */}
+                        {/* <div className="d-grid d-lg-block">
                           <button
                             className="btn btn-primary"
                             onClick={() => {
@@ -400,147 +507,185 @@ const AddVarient = () => {
                           >
                             + Add Images
                           </button>
-                        </div>
-                        <div className="d-flex mt-3 mt-lg-0">
+                        </div> */}
+                        {/* <div className="d-flex mt-3 mt-lg-0">
                           <button className="btn btn-success-soft">Save</button>
-                        </div>
+                        </div> */}
+                        {/* </div> */}
                       </div>
+                      <table className="table mb-1">
+                        <thead className="table-light">
+                          <tr className="text-center">
+                            <th scope="col">Size</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Sale Price</th>
+                            <th scope="col">SKU ID</th>
+                            <th scope="col">Stock</th>
+                            <th scope="col">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {variantData &&
+                            variantData.map((item, i, arr) => {
+                              return (
+                                <tr className="text-center" key={i}>
+                                  <td>
+                                    <span>{item.size_name}</span>
+                                  </td>
+                                  <td>
+                                    <input
+                                      type="text"
+                                      className={`form-control `}
+                                      placeholder="₹ ___"
+                                      id={`product_price_${i}`}
+                                      value={item.price || ""}
+                                      name="price"
+                                      onChange={(e) => {
+                                        handleVariantData(
+                                          e,
+                                          item.variant_id,
+                                          i
+                                        );
+                                      }}
+                                      onInput={(e) => handleOnInput(e)}
+                                    />
+                                  </td>
+                                  <td>
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="₹ ___"
+                                      name="sale_price"
+                                      id={`sale_price_${i}`}
+                                      value={item.sale_price || ""}
+                                      onChange={(e) => {
+                                        handleVariantData(
+                                          e,
+                                          item.variant_id,
+                                          i
+                                        );
+                                      }}
+                                      onInput={(e) => handleOnInput(e)}
+                                    />
+                                  </td>
+                                  <td>
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="Enter SKU ID"
+                                      name="sku_id"
+                                      id={`sku_id_${i}`}
+                                      value={item.sku_id || ""}
+                                      onChange={(e) => {
+                                        handleVariantData(
+                                          e,
+                                          item.variant_id,
+                                          i
+                                        );
+                                      }}
+                                    />
+                                  </td>
+                                  <td>
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="100"
+                                      name="stock"
+                                      id={`product_stock_${i}`}
+                                      value={item.stock || ""}
+                                      onChange={(e) => {
+                                        handleVariantData(
+                                          e,
+                                          item.variant_id,
+                                          i
+                                        );
+                                      }}
+                                      onInput={(e) => handleOnInput(e)}
+                                    />
+                                  </td>
+                                  <td>
+                                    <button
+                                      className="btn btn-danger-soft"
+                                      onClick={() => {
+                                        DeleteVariant(
+                                          item.variant_id,
+                                          product_id,
+                                          item.color_id
+                                        );
+                                      }}
+                                    >
+                                      <IconPack icon={"delete"} />
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </tbody>
+                      </table>
                     </div>
-                    <table className="table mb-1">
-                      <thead className="table-light">
-                        <tr className="text-center">
-                          <th scope="col">Size</th>
-                          <th scope="col">Price</th>
-                          <th scope="col">Sale Price</th>
-                          <th scope="col">SKU ID</th>
-                          <th scope="col">Stock</th>
-                          <th scope="col">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {variantData &&
-                          variantData.map((item, i, arr) => {
-                            return (
-                              <tr className="text-center" key={i}>
-                                <td>
-                                  <span>{item.size_name}</span>
-                                </td>
-                                <td>
-                                  <input
-                                    type="text"
-                                    className={`form-control `}
-                                    placeholder="₹ ___"
-                                    id={`product_price_${i}`}
-                                    value={item.price || ""}
-                                    name="price"
-                                    onChange={(e) => {
-                                      handleVariantData(e, item.variant_id, i);
-                                    }}
-                                    onInput={(e) => handleOnInput(e)}
-                                  />
-                                </td>
-                                <td>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="₹ ___"
-                                    name="sale_price"
-                                    id={`sale_price_${i}`}
-                                    value={item.sale_price || ""}
-                                    onChange={(e) => {
-                                      handleVariantData(e, item.variant_id, i);
-                                    }}
-                                    onInput={(e) => handleOnInput(e)}
-                                  />
-                                </td>
-                                <td>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Enter SKU ID"
-                                    name="sku_name"
-                                    id={`sku_id_${i}`}
-                                    value={item.sku_name || ""}
-                                    onChange={(e) => {
-                                      handleVariantData(e, item.variant_id, i);
-                                    }}
-                                  />
-                                </td>
-                                <td>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="100"
-                                    name="stock"
-                                    id={`product_stock_${i}`}
-                                    value={item.stock || ""}
-                                    onChange={(e) => {
-                                      handleVariantData(e, item.variant_id, i);
-                                    }}
-                                    onInput={(e) => handleOnInput(e)}
-                                  />
-                                </td>
-                                <td>
-                                  <button
-                                    className="btn btn-danger-soft"
-                                    onClick={() => {
-                                      DeleteVariant(
-                                        item.variant_id,
-                                        product_id,
-                                        item.color_id
-                                      );
-                                    }}
-                                  >
-                                    <IconPack icon={"delete"} />
-                                  </button>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
-                  </div>
-                </TabPanel>
-              </TabContext>
-            </Box>
-          </div>
+                  </TabPanel>
+                </TabContext>
+              </Box>
+            </div>
+            <div className="card mb-3">
+              <div className="align-items-center card-header d-flex justify-content-between">
+                <h4 className="mb-0">Product Images</h4>
+                <div className="d-grid d-lg-block">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      setImageModal(true);
+                    }}
+                  >
+                    + Add Images
+                  </button>
+                </div>
+              </div>
+              <div className="card-body">
+                <div className="d-flex flex-wrap gap-4">
+                  {images.length != 0 ? (
+                    images.image_array.map((item, i) => {
+                      return (
+                        <div key={i}>
+                          <img
+                            src={item}
+                            className="border rounded-3"
+                            height={150}
+                            width={150}
+                          />
+                          <div className="d-flex justify-content-between mt-1">
+                            <button
+                              className="btn btn-primary-soft btn-sm"
+                              onClick={() => {
+                                setUpdateImageModal(true);
+                                setUpdateIndex(i);
+                              }}
+                            >
+                              Change
+                            </button>
+                            <button
+                              className="btn btn-danger-soft btn-sm"
+                              onClick={() => {
+                                HandleDeleteImage(i);
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <h4 className="text-danger">*Add At least one image</h4>
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
         ) : (
           ""
         )}
 
-        {images.length !=0   ? (
-          <div className="card mb-3">
-            <div className="card-header">
-              <h4 className="mb-0">Product Images</h4>
-            </div>
-            <div className="card-body">
-              <div className="d-flex flex-wrap gap-4">
-                {images.image_array.map((item, i) => {
-                  return (
-                    <div key={i}>
-                      <img
-                        src={item}
-                        className="rounded-3"
-                        height={150}
-                        width={150}
-                      />
-                      <div className="d-flex justify-content-between mt-1">
-                        <button className="btn btn-primary-soft btn-sm">
-                          Change
-                        </button>
-                        <button className="btn btn-danger-soft btn-sm">
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
         <div className="d-flex justify-content-between">
           <button
             onClick={() => {
@@ -551,10 +696,14 @@ const AddVarient = () => {
             <IconPack icon={"leftarrow"} />
             Back
           </button>
-          <button onClick={SubmitVariantData} className="btn btn-primary">
-            Next
-            <IconPack icon={"rightarrow"} />
-          </button>
+          {colorIds && colorIds[colorIds.length - 1]?.color_id == value ? (
+            <button onClick={SubmitVariantData} className="btn btn-primary">
+              Next
+              <IconPack icon={"rightarrow"} />
+            </button>
+          ) : (
+            ""
+          )}
         </div>
       </div>
 
@@ -621,6 +770,17 @@ const AddVarient = () => {
         size={"md"}
       >
         <DropZone files={files} setFiles={setFiles} />
+      </CustomeModal>
+
+      {/* Update Image Modal */}
+      <CustomeModal
+        title={"Update image"}
+        handleClose={handleUpdateImageClose}
+        show={updateImageModal}
+        onSubmit={submitUpdateImage}
+        size={"md"}
+      >
+        <DropZone files={files} setFiles={setFiles} maxImage={1} />
       </CustomeModal>
     </>
   );

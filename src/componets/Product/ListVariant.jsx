@@ -49,7 +49,7 @@ const ListVariant = ({ value , variantData , SubmitVariantData }) => {
           msg = "Sale price name is required";
           break;
         }
-        if (element.sku_name == null || element.sku_name.length === 0) {
+        if (element.sku_id == null || element.sku_id.length === 0) {
           $(`#sku_id_${index}`).addClass("error-input");
           msg = "SKU ID name is required";
           break;
@@ -132,9 +132,9 @@ const ListVariant = ({ value , variantData , SubmitVariantData }) => {
                         type="text"
                         className="form-control"
                         placeholder="Enter SKU ID"
-                        name="sku_name"
+                        name="sku_id"
                         id={`sku_id_${i}`}
-                        value={item.sku_name}
+                        value={item.sku_id}
                         // name={`sku_id[${i}]`}
                         // onChange={handleVariantData}
                         onChange={(e) => {

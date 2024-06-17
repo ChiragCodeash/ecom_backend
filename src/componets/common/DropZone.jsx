@@ -1,28 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useDropzone } from "react-dropzone";
 import IconPack from "./IconPack";
-import $ from "jquery";
 import { toast } from "react-toastify";
 
-const DropZone = ({ files, setFiles }) => {
-  // const [files, setFiles] = useState([]);
-
+const DropZone = ({ files, setFiles, maxImage }) => {
   const deleteImg = (i) => {
     files.splice(i, 1);
     setFiles([...files]);
   };
 
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    maxFiles: 5,
+    maxFiles: maxImage || 5,
     accept: {
       "image/jpeg": [],
       "image/png": [],
     },
     onDrop: (acceptedFiles) => {
-      if (files.length < 5) {
+      if (files.length < (maxImage || 5)) {
         setFiles([...files, ...acceptedFiles]);
       } else {
-        toast.error("Maximum five image is allowed", {
+        toast.error(`Maximum ${maxImage || 5} image is allowed`, {
           position: toast.POSITION.TOP_RIGHT,
         });
       }

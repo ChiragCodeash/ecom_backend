@@ -15,6 +15,7 @@ const ColorAndSizeState = ({ children }) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
         },
       });
       const result = await response.json();
@@ -35,6 +36,7 @@ const ColorAndSizeState = ({ children }) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
         },
       });
       const result = await response.json();
@@ -55,6 +57,7 @@ const ColorAndSizeState = ({ children }) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
         },
       });
       const result = await response.json();
