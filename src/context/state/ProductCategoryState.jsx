@@ -35,18 +35,17 @@ const ProductCategoryState = ({ children }) => {
         setProductCategory(result.data);
       } else {
         toast.error(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
       }
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };
 
-  
   const GetSingalCategory = async (id) => {
     try {
       const response = await fetch(`${url}/${id}`, {
@@ -64,13 +63,13 @@ const ProductCategoryState = ({ children }) => {
         }
       } else {
         // toast.error(result.message, {
-        //   position: toast.POSITION.TOP_RIGHT,
+        //   //position: toast.POSITION.TOP_RIGHT,
         // });
       }
     } catch (error) {
       console.log("Error fetching data:", error.message);
       // toast.error("Internal server error", {
-      //   position: toast.POSITION.TOP_RIGHT,
+      //   //position: toast.POSITION.TOP_RIGHT,
       // });
     }
   };

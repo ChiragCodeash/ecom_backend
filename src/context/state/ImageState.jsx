@@ -19,7 +19,7 @@ const ImageState = ({ children }) => {
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };
@@ -39,7 +39,7 @@ const ImageState = ({ children }) => {
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };
@@ -59,7 +59,7 @@ const ImageState = ({ children }) => {
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };

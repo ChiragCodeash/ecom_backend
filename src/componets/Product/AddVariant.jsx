@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
-import Box from "@mui/material/Box";
-import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
+import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import $ from "jquery";
+import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { Bounce, toast } from "react-toastify";
 import {
   ColorAndSizeContext,
   ImageContext,
   ProductContext,
 } from "../../context/CreateContext";
 import CustomeModal from "../common/CustomeModal";
-import IconPack from "../common/IconPack";
-import { toast } from "react-toastify";
-import $ from "jquery";
-import TagInput from "../common/TagInput";
 import DropZone from "../common/DropZone";
+import IconPack from "../common/IconPack";
+import TagInput from "../common/TagInput";
+import { ElectricScooterSharp } from "@mui/icons-material";
 
 const AddVarient = () => {
   const location = useLocation();
@@ -30,8 +30,14 @@ const AddVarient = () => {
   const { product_id } = params;
 
   // Context API -----------------
-  const { createVariant, getAllVariant, deleteVariant } =
-    useContext(ProductContext);
+  const {
+    createVariant,
+    getAllVariant,
+    deleteVariant,
+    updateVariant,
+    checkVariant,
+   
+  } = useContext(ProductContext);
   const { varient, handleVarientForm, setVarient } =
     useContext(ProductContext).Variant;
   const { getColorAndSize, sizeAndColor, addColor, addSize } =
@@ -45,6 +51,7 @@ const AddVarient = () => {
   const [value, setValue] = useState();
   const [files, setFiles] = useState([]);
   const [updateIndex, setUpdateIndex] = useState();
+  const [isChanges, setIsChanges] = useState(false);
 
   const [newSize, setNewSize] = useState([]);
   const [newColor, setNewColor] = useState([]);
@@ -53,6 +60,7 @@ const AddVarient = () => {
   const [colorModal, setColorModal] = useState(false);
   const [imageModal, setImageModal] = useState(false);
   const [updateImageModal, setUpdateImageModal] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState(false);
 
   // Modal ------------------
   const handleClose = () => {
@@ -70,6 +78,50 @@ const AddVarient = () => {
     setUpdateImageModal(false);
     setFiles([]);
   };
+  const handleConfirmationClose = () => {
+    setConfirmationModal(false);
+  };
+
+  const updateVariantdata = async () => {
+    if (isChanges) {
+      const toastId = toast.loading("Loading...", {
+        closeOnClick: true,
+      });
+      const sendData = variantData.map(
+        ({ variant_id, price, sale_price, variant_status, stock, sku_id }) => {
+          return {
+            variant_id,
+            price,
+            sale_price,
+            variant_status,
+            stock,
+            sku_id,
+          };
+        }
+      );
+      const result = await updateVariant(sendData);
+      if (result.status) {
+        toast.update(toastId, {
+          render: result.message,
+          type: "success",
+          isLoading: false,
+          transition: Bounce,
+          autoClose: 3000,
+        });
+        return true;
+      } else {
+        toast.update(toastId, {
+          render: result.message,
+          type: "error",
+          isLoading: false,
+          transition: Bounce,
+          autoClose: 3000,
+        });
+        return false;
+      }
+    }
+    return true;
+  };
 
   const handleVariantData = (e, variant_id, index) => {
     $(e.target).removeClass("error-input");
@@ -82,12 +134,13 @@ const AddVarient = () => {
       variant_id: variant_id,
     };
     setVatiantData(newFormData);
+    setIsChanges(true)
   };
   const handleOnInput = (e, number) => {
     e.target.value = e.target.value
       .replace(/[^0-9.]/g, "")
       .replace(/(\..*?)\..*/g, "$1")
-      .slice(0, number || 5);
+      .slice(0, number || 9);
   };
   const validation = () => {
     // e.preventDefault();
@@ -119,17 +172,33 @@ const AddVarient = () => {
     }
     return msg;
   };
-  const SubmitVariantData = (e) => {
+  const SubmitVariantData = async (e) => {
     e.preventDefault();
     const msg = validation(e);
-    // console.log(msg);
     if (msg || images.length == 0) {
       toast.error("Please complate this variant first", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     } else {
-      console.log(variantData);
+      const isAdded = await updateVariantdata();
+      if (isAdded) {
+        setConfirmationModal(true);
+      }
     }
+  };
+
+  const resetFunction = () => {
+    setVatiantData([]);
+    setColorIds();
+    setImages([]);
+    setValue();
+    setFiles([]);
+    setUpdateIndex();
+    setIsChanges(false);
+    setVarient({
+      size_id: "",
+      color_id: "",
+    });
   };
 
   useEffect(() => {
@@ -148,12 +217,13 @@ const AddVarient = () => {
       };
       fetch();
     }
+    return () => {
+      resetFunction();
+    };
   }, []);
 
   // Add Variant ---------------
-  const CreateVariantValidation = (e) => {
-    e.preventDefault();
-
+  const CreateVariantValidation = () => {
     if (varient.color_id.length == 0) {
       $(`#color_name`).addClass("error-input");
       return "Color name is required";
@@ -165,14 +235,10 @@ const AddVarient = () => {
     }
   };
 
-  const CreateVarient = (e) => {
-    e.preventDefault();
-
-    const msg = CreateVariantValidation(e);
+  const CreateVarient = () => {
+    const msg = CreateVariantValidation();
     if (msg) {
-      toast.error(msg, {
-        position: toast.POSITION.TOP_RIGHT,
-      });
+      toast.error(msg, {});
     } else {
       const fetch = async () => {
         const status = await createVariant({
@@ -181,7 +247,9 @@ const AddVarient = () => {
         });
         if (status) {
           const data = await getAllVariant(product_id, varient.color_id);
-          // setValue(varient.color_id.toString());
+
+          setValue(varient.color_id.toString());
+
           setVatiantData(data.variants);
           setColorIds(data.color);
           setImages(data.images);
@@ -192,8 +260,62 @@ const AddVarient = () => {
         ...varient,
         size_id: "",
       });
+      // } else {
+      //   if (validation()) {
+      //     toast.error("Please complate this variant first", {
+      //       //position: toast.POSITION.TOP_RIGHT,
+      //     });
+      //   }
+      // }
     }
   };
+
+  // // START ============================================================================================================
+
+  // const demoFunc = async() => {
+
+  //     const status = await createVariant({
+  //       ...varient,
+  //       product_id: product_id,
+  //     });
+  //     if (status) {
+  //       const data = await getAllVariant(product_id, varient.color_id);
+
+  //       setValue(varient.color_id.toString());
+
+  //       setVatiantData(data.variants);
+  //       setColorIds(data.color);
+  //       setImages(data.images);
+  //     }
+  //   setVarient({
+  //     ...varient,
+  //     size_id: "",
+  //   });
+
+  // };
+
+  // const CreateVariant1 = async() => {
+  //   const msg = CreateVariantValidation();
+  //   if (msg) {
+  //     toast.error(msg);
+  //   } else {
+  //     if (value != varient.color_id) {
+  //       demoFunc();
+  //     } else {
+  //       const msg = validation();
+  //       if (msg || images.length == 0) {
+  //         toast.error("Please complate this variant first");
+  //       } else {
+  //         const isDone = await updateVariantdata()
+  //         if(isDone){
+  //           demoFunc();
+  //         }
+  //       }
+  //     }
+  //   }
+  // };
+
+  // //END ========================================================================================================
 
   // Delete Variant -------------------
   const DeleteVariant = (variant_id, product_id, color_id) => {
@@ -222,24 +344,28 @@ const AddVarient = () => {
   };
 
   // Handle Tab  ------------------
-  const handleChange = (event, newValue) => {
-    console.log(variantData)
-    
+  const handleChange = async (event, newValue, run) => {
+   
     if (!validation() && images.length != 0) {
-      const fetch = async () => {
-        const data = await getAllVariant(product_id, newValue);
-        setVatiantData(data.variants);
-        setColorIds(data.color);
-        setImages(data.images);
-      };
-      fetch();
-      setValue(newValue);
-      setVarient({ ...varient, color_id: newValue });
-      $(".error-input").removeClass("error-input");
+      const isDone = !run ? await updateVariantdata() : true;
+      if (isDone) {
+        const fetch = async () => {
+          const data = await getAllVariant(product_id, newValue);
+          setVatiantData(data.variants);
+          setColorIds(data.color);
+          setImages(data.images);
+        };
+        fetch();
+        setValue(newValue);
+        setVarient({ ...varient, color_id: newValue });
+        setIsChanges(false)
+        $(".error-input").removeClass("error-input");
+
+        return true;
+      }
     } else {
-      toast.error("Please complate this variant first", {
-        position: toast.POSITION.TOP_RIGHT,
-      });
+      toast.error("Please complate this variant first");
+      return false;
     }
   };
 
@@ -249,7 +375,7 @@ const AddVarient = () => {
     if (!newSize.length) {
       $(`.tagify`).addClass("error-input");
       toast.error("Sizes is required", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
       $("#modalSubmitBtn").text("Save Changes");
     } else {
@@ -269,7 +395,7 @@ const AddVarient = () => {
     if (!newColor.length) {
       $(`.tagify`).addClass("error-input");
       toast.error("Colors is required", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
       $("#modalSubmitBtn").text("Save Changes");
     } else {
@@ -281,6 +407,7 @@ const AddVarient = () => {
       }
     }
   };
+
   const submitNewImages = async () => {
     $("#modalSubmitBtn").text("Loading...").addClass("disabled");
     if (files.length) {
@@ -296,25 +423,17 @@ const AddVarient = () => {
           setImages(result.data);
           setFiles([]);
           setImageModal(false);
-          toast.success(result.message, {
-            position: toast.POSITION.TOP_RIGHT,
-          });
+          toast.success(result.message);
         } else {
-          toast.error(result.message, {
-            position: toast.POSITION.TOP_RIGHT,
-          });
+          toast.error(result.message);
         }
       } else {
-        toast.error("You can add upto 5 images", {
-          position: toast.POSITION.TOP_RIGHT,
-        });
+        toast.error("You can add upto 5 images");
       }
     } else {
-      toast.error("Images are required", {
-        position: toast.POSITION.TOP_RIGHT,
-      });
+      toast.error("Images are required");
     }
-    $("#modalSubmitBtn").text("Save Changes");
+    $("#modalSubmitBtn").text("Save Changes").removeClass("disabled");
   };
 
   const HandleDeleteImage = async (index) => {
@@ -332,16 +451,17 @@ const AddVarient = () => {
       });
 
       toast.success(result.message, {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     } else {
       toast.error(result.message, {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };
 
   const submitUpdateImage = async () => {
+    console.log("Run")
     $("#modalSubmitBtn").text("Loading...").addClass("disabled");
     if (files.length) {
       const { image_id } = images;
@@ -360,29 +480,40 @@ const AddVarient = () => {
         });
         setFiles([]);
         setUpdateImageModal(false);
-        toast.success(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
-        });
+        toast.success(result.message);
       } else {
-        toast.error(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
-        });
+        toast.error(result.message);
       }
     } else {
-      toast.error("Images are required", {
-        position: toast.POSITION.TOP_RIGHT,
-      });
+      toast.error("Images are required");
     }
-    $("#modalSubmitBtn").text("Save Changes");
+    $("#modalSubmitBtn").text("Save Changes").removeClass("disabled");
+  };
+
+  const submitProduct = async () => {
+    const result = await checkVariant(product_id);
+    if (result.status) {
+      toast.success(result.message);
+      // setConfirmationModal(false);
+      navigate("/viewproduct");
+    } else {
+      handleChange("q", result.data.color_id.toString(), true);
+      toast.error(result.message);
+    }
+    setConfirmationModal(false);
   };
   return (
     <>
       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-12">
+          <div className="align-items-center bg-white d-flex justify-content-between mb-4 p-5 rounded-3 shadow-sm">
+              <h3 className="m-0">Create Variants</h3>
+              {/* <button className="btn btn-primary">Add Product</button> */}
+            </div>
             <div className="card mb-4">
               <div className="card-header">
-                <h4 className="mb-0">Create Variant</h4>
+                <h4 className="mb-0">Choose Variant</h4>
               </div>
               <div className="card-body">
                 {sizeAndColor && (
@@ -456,6 +587,7 @@ const AddVarient = () => {
                       <button
                         className="btn btn-success w-100"
                         onClick={CreateVarient}
+                        // onClick={CreateVariant1}
                       >
                         Add Variant
                       </button>
@@ -698,7 +830,7 @@ const AddVarient = () => {
           </button>
           {colorIds && colorIds[colorIds.length - 1]?.color_id == value ? (
             <button onClick={SubmitVariantData} className="btn btn-primary">
-              Next
+              Submit
               <IconPack icon={"rightarrow"} />
             </button>
           ) : (
@@ -781,6 +913,19 @@ const AddVarient = () => {
         size={"md"}
       >
         <DropZone files={files} setFiles={setFiles} maxImage={1} />
+      </CustomeModal>
+
+      {/* Update Image Modal */}
+      <CustomeModal
+        title={"Confirmation"}
+        handleClose={handleConfirmationClose}
+        show={confirmationModal}
+        onSubmit={submitProduct}
+        size={"md"}
+        save={"Yes"}
+        close={"No"}
+      >
+        <p>Are you sure you want to submit this product?</p>
       </CustomeModal>
     </>
   );

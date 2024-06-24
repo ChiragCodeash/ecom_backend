@@ -31,8 +31,7 @@ const CreateProduct = () => {
   useEffect(() => {
     GetCategory();
     // console.log(typeof(paramValue))
-    if ( paramValue) {
-      
+    if (paramValue) {
       const fetch = async () => {
         const { pc_id, product_title, product_desc, pack_of, ideal_for } =
           await getSingalProduct(paramValue);
@@ -49,6 +48,16 @@ const CreateProduct = () => {
     } else {
       navigate("/addproduct");
     }
+
+    return () => {
+      setCreateProductData({
+        pc_id: "",
+        product_title: "",
+        product_desc: "",
+        ideal_for: "",
+        pack_of: "",
+      });
+    };
   }, []);
 
   const handleForm = (e) => {
@@ -103,10 +112,10 @@ const CreateProduct = () => {
     const msg = validation();
     if (!msg.status) {
       toast.error(msg.message, {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     } else {
-      console.log({ ...CreateProductData, product_desc: value });
+      // console.log({ ...CreateProductData, product_desc: value });
       if (paramValue) {
         updateProduct({
           ...CreateProductData,
@@ -131,9 +140,13 @@ const CreateProduct = () => {
       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-12 col-12">
+            <div className="align-items-center bg-white d-flex justify-content-between mb-4 p-5 rounded-3 shadow-sm">
+              <h3 className="m-0">Create Product</h3>
+              {/* <button className="btn btn-primary">Add Product</button> */}
+            </div>
             <div className="card mb-4">
               <div className="card-header">
-                <h4 className="mb-0">Basic Information</h4>
+                <label className="mb-0 form-label">Basic Information</label>
               </div>
               <div className="card-body">
                 <div className="row">
@@ -182,7 +195,6 @@ const CreateProduct = () => {
                       name="pack_of"
                       onChange={handleForm}
                       value={CreateProductData.pack_of}
-                      
                     >
                       <option value={""}>Select pack of</option>
                       <option value={"1"}>1</option>
@@ -191,7 +203,7 @@ const CreateProduct = () => {
                       <option value={"4"}>4</option>
                     </select>
                   </div>
-                 
+
                   <div className="mb-3 col-md-6">
                     <label className="form-label">Ideal For</label>
                     <select
@@ -202,7 +214,6 @@ const CreateProduct = () => {
                       name="ideal_for"
                       onChange={handleForm}
                       value={CreateProductData.ideal_for}
-                      
                     >
                       <option value={""}>Select Ideal</option>
                       <option value={"male"}>Male</option>
@@ -214,8 +225,10 @@ const CreateProduct = () => {
 
                 <div>
                   {/* heading */}
-                  <h5 className="mb-1">Product Description</h5>
-                  <p>Add Product Description</p>
+                  <label className="m-0 form-label">Product Description</label>
+                  <p className="fs-5 m-0 mb-3 text-muted">
+                    Add Product Description
+                  </p>
                   {/* input */}
                   <TextEditor
                     value={value}
@@ -229,12 +242,7 @@ const CreateProduct = () => {
         </div>
 
         <div className="d-flex justify-content-end">
-          <button
-            onClick={() => {
-              SubmitForm();
-            }}
-            className="btn btn-primary"
-          >
+          <button onClick={SubmitForm} className="btn btn-primary">
             Next
             <IconPack icon={"rightarrow"} />
           </button>

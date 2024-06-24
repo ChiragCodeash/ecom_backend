@@ -3,14 +3,11 @@ import Layout from "./componets/Layout";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import routes from "./routes";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import Login from "./componets/pages/Login";
 import Registration from "./componets/pages/Registration";
 import ResetPass from "./componets/pages/ResetPass";
 import Page404 from "./componets/pages/Page404";
-import TagInput from "./componets/common/TagInput";
-import Test from "./Test";
-import Loading from "./componets/common/Loading";
 import ImageGallery from "./Test";
 
 const App = () => {
@@ -24,22 +21,13 @@ const App = () => {
   }, []);
   return (
     <>
-      {/* <Toast message={"Succeess"}/> */}
-      <ToastContainer />
+      <ToastContainer
+        stacked
+        autoClose={3000}
+        position="bottom-right"
+        closeOnClick
+      />
       <Routes>
-        {/* {routes.map((route, index) => {
-          return (
-            <Route
-              key={index}
-              exact={route.exact}
-              path={route.path}
-              element={
-                <Layout Componets={route.component} title={route.title} />
-              }
-            />
-          );
-        })} */}
-
         {routes.map((route, index) => {
           if (route.NestedRoutes) {
             return (
@@ -104,7 +92,6 @@ const App = () => {
         <Route path="*" element={<Page404 title="Page not Found" />} />
       </Routes>
     </>
-    // <Layout componet={} />
   );
 };
 

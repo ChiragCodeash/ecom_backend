@@ -23,152 +23,185 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CategoryIcon from '@mui/icons-material/Category';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import { IconCaretRightFilled, IconEdit, IconEye, IconTrash } from "@tabler/icons-react";
 
 
-const IconPack = ({ icon, size }) => {
+const IconPack = ({ icon, size , className }) => {
+
   switch (icon) {
     case "youtube":
       return (
         <>
-          <YouTubeIcon fontSize={size || "medium"} />
+          <YouTubeIcon fontSize={size || "medium"} className={className ? className : ""}/>
         </>
       );
     case "instagram":
       return (
         <>
-          <InstagramIcon fontSize={size || "medium"} />
+          <InstagramIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "facebook":
       return (
         <>
-          <FacebookTwoToneIcon fontSize={size || "medium"} />
+          <FacebookTwoToneIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "twitter":
       return (
         <>
-          <TwitterIcon fontSize={size || "medium"} />
+          <TwitterIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "pinterest":
       return (
         <>
-          <PinterestIcon fontSize={size || "medium"} />
+          <PinterestIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "search":
       return (
         <>
-          <SearchIcon fontSize={size || "medium"} />
+          <SearchIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "cart":
       return (
         <>
-          <LocalMallOutlinedIcon fontSize={size || "medium"} />
+          <LocalMallOutlinedIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "close":
       return (
         <>
-          <CloseOutlinedIcon fontSize={size || "medium"} />
+          <CloseOutlinedIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "heart":
       return (
         <>
-          <FavoriteBorderOutlinedIcon fontSize={size || "medium"} />
+          <FavoriteBorderOutlinedIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "user":
       return (
         <>
-          <PersonOutlineOutlinedIcon fontSize={size || "medium"} />
+          <PersonOutlineOutlinedIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "nav":
       return (
         <>
-          <ClearAllOutlinedIcon fontSize={size || "medium"} />
+          <ClearAllOutlinedIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "shipping":
       return (
         <>
-          <LocalShippingOutlinedIcon fontSize={size || "medium"} />
+          <LocalShippingOutlinedIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "rightarrow":
       return (
         <>
-          <KeyboardArrowRightIcon fontSize={size || "medium"} />
+          <KeyboardArrowRightIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "leftarrow":
       return (
         <>
-          <ChevronLeftIcon fontSize={size || "medium"} />
+          <ChevronLeftIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "downarrow":
       return (
         <>
-          <KeyboardArrowDownIcon fontSize={size || "medium"} />
+          <KeyboardArrowDownIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "toparrow":
       return (
         <>
-          <KeyboardArrowUpIcon fontSize={size || "medium"} />
+          <KeyboardArrowUpIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "dashboard":
       return (
         <>
-          <DashboardIcon fontSize={size || "medium"} />
+          <DashboardIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "setting":
       return (
         <>
-          <SettingsIcon fontSize={size || "medium"} />
+          <SettingsIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "theme":
       return (
         <>
-          <AutoAwesomeIcon fontSize={size || "medium"} />
+          <AutoAwesomeIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "login":
       return (
         <>
-          <LoginIcon fontSize={size || "medium"} />
+          <LoginIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "filladd":
       return (
         <>
-          <AddCircleIcon fontSize={size || "medium"} />
+          <AddCircleIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "product":
       return (
         <>
-          <CategoryIcon fontSize={size || "medium"} />
+          <CategoryIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "delete":
       return (
         <>
-          <DeleteIcon fontSize={size || "medium"} />
+          <DeleteIcon fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
     case "add":
       return (
         <>
-          <AddIcon fontSize={size || "medium"} />
+          <AddIcon fontSize={size || "medium"} className={className ? className : ""} />
+        </>
+      );
+    case "view":
+      return (
+        <>
+          <RemoveRedEyeIcon fontSize={size || "medium"} className={className ? className : ""} />
+        </>
+      );
+    case "eye":
+      return (
+        <>
+          <IconEye fontSize={size || "medium"} className={className ? className : ""} />
+        </>
+      );
+    case "trash":
+      return (
+        <>
+          <IconTrash fontSize={size || "medium"} className={className ? className : ""} />
+        </>
+      );
+    case "edit":
+      return (
+        <>
+          <IconEdit fontSize={size || "medium"} className={className ? className : ""} />
+        </>
+      );
+    case "caret-right":
+      return (
+        <>
+          <IconCaretRightFilled fontSize={size || "medium"} className={className ? className : ""} />
         </>
       );
 

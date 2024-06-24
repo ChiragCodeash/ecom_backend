@@ -106,3 +106,7 @@
 .tagify{
   width: 100% !important;
 }
+
+.modal.fade ,.modal-backdrop {
+  z-index: 10000000 !important;
+}

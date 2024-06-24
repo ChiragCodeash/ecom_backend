@@ -1,9 +1,13 @@
-import React from 'react'
+import React from "react";
 
 const Loading = () => {
   return (
-    <div class="spinner"></div>
-  )
-}
+    <div className="text-center  p-3">
+      <div className="spinner-border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  );
+};
 
-export default Loading
+export default Loading;

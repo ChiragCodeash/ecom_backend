@@ -42,17 +42,17 @@ const ThemeState = ({ children }) => {
       if (data) {
         setThemeCounter(themeCounter + 1);
         toast.success(data.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
       } else {
         toast.warning(data.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
       }
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.warning(error.message, {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };

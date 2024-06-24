@@ -25,7 +25,7 @@ const ColorAndSizeState = ({ children }) => {
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };
@@ -46,7 +46,7 @@ const ColorAndSizeState = ({ children }) => {
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };
@@ -67,7 +67,7 @@ const ColorAndSizeState = ({ children }) => {
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };
@@ -87,19 +87,19 @@ const ColorAndSizeState = ({ children }) => {
       if (result.status) {
         setSizeAndColor({ size: sizeAndColor.size, color: result.data });
         toast.success(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
         return true;
       } else {
         toast.error(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
         return false;
       }
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
       return false;
     }
@@ -120,19 +120,19 @@ const ColorAndSizeState = ({ children }) => {
       if (result.status) {
         setSizeAndColor({ color: sizeAndColor.color, size: result.data });
         toast.success(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
         return true;
       } else {
         toast.error(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
         return false;
       }
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
       return false;
     }

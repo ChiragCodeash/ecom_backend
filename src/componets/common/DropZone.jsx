@@ -20,7 +20,7 @@ const DropZone = ({ files, setFiles, maxImage }) => {
         setFiles([...files, ...acceptedFiles]);
       } else {
         toast.error(`Maximum ${maxImage || 5} image is allowed`, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
       }
     },
@@ -59,7 +59,7 @@ const DropZone = ({ files, setFiles, maxImage }) => {
           })}
         >
           <input {...getInputProps()} />
-          <p className="m-0">
+          <p className="m-0 text-center fw-semi-bold">
             Drag and drop some files here, or click to select files
           </p>
         </div>

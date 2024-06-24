@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 {/* <SidebarComponet Componets={<Componets />} /> */}
 
 
-const Layout = ({ Componets }) => {
+const Layout = ({ Componets , title}) => {
+  document.title = `Admin | ${title}`
+  
   const navigate = useNavigate();
   const isLogin = localStorage.getItem("token");
   useEffect(() => {

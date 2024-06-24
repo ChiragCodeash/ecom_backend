@@ -11,6 +11,8 @@ const CustomeModal = ({
   title,
   backdrop,
   onSubmit,
+  close,
+  save
 }) => {
   return (
     <>
@@ -28,10 +30,10 @@ const CustomeModal = ({
         <Modal.Body>{children}</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Close
+            {close || "Close"}
           </Button>
           <Button variant="primary" id="modalSubmitBtn" onClick={onSubmit}>
-            Save Changes
+            {save || "Save Changes"}
           </Button>
         </Modal.Footer>
       </Modal>

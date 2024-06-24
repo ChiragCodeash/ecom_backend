@@ -21,17 +21,17 @@ const AuthState = ({ children }) => {
       if (result.status) {
         navigate("/login");
         toast.success(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
       } else {
         toast.error(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
       }
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };
@@ -51,17 +51,17 @@ const AuthState = ({ children }) => {
         navigate("/");
         localStorage.setItem("token", result.token);
         toast.success(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
       } else {
         toast.error(result.message, {
-          position: toast.POSITION.TOP_RIGHT,
+          //position: toast.POSITION.TOP_RIGHT,
         });
       }
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
-        position: toast.POSITION.TOP_RIGHT,
+        //position: toast.POSITION.TOP_RIGHT,
       });
     }
   };
