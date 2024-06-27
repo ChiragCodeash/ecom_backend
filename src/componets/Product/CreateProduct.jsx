@@ -1,17 +1,21 @@
-import React, { useContext, useEffect, useState } from "react";
-import TextEditor from "../common/TextEditor";
+import { useFormik } from "formik";
+import React, { useContext, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
 import {
+  GlobalContext,
   ProductCategoryContext,
   ProductContext,
 } from "../../context/CreateContext";
-import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import IconPack from "../common/IconPack";
-import { FieldRequiredValidation, TitleValidation } from "../../Validation";
+import TextEditor from "../common/TextEditor";
+import Loading from "../common/Loading";
 // import CreateVariantUI from "./CreateVariantUI";
 
 const CreateProduct = () => {
   const location = useLocation();
+  const { loading } = useContext(GlobalContext);
   const queryParams = new URLSearchParams(location.search);
   const paramValue = queryParams.get("product_id");
   const {
@@ -20,12 +24,8 @@ const CreateProduct = () => {
     createProduct,
     updateProduct,
     getSingalProduct,
-    createVariant,
   } = useContext(ProductContext);
-  const { varient } = useContext(ProductContext).Variant;
   const { GetCategory, ProductCategory } = useContext(ProductCategoryContext);
-  const [value, setValue] = useState("");
-  const [isValidate, setIsValidate] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,10 +42,10 @@ const CreateProduct = () => {
           pack_of,
           ideal_for,
         });
-        setValue(product_desc);
       };
       fetch();
     } else {
+      console.log("Run");
       navigate("/addproduct");
     }
 
@@ -60,80 +60,69 @@ const CreateProduct = () => {
     };
   }, []);
 
-  const handleForm = (e) => {
-    // console.log(e.target.value)
-    setIsValidate();
-    setCreateProductData({
-      ...CreateProductData,
-      [e.target.name]: e.target.value,
-    });
+  const stripHtml = (html) => {
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
   };
 
-  const validation = () => {
-    var isValidate;
-    isValidate = TitleValidation(
-      CreateProductData.product_title,
-      "product_title"
-    );
-    if (!isValidate.status) {
-      setIsValidate(isValidate.name);
-      return isValidate;
-    }
-
-    isValidate = FieldRequiredValidation(CreateProductData.pc_id, "Category");
-    if (!isValidate.status) {
-      setIsValidate(isValidate.name);
-      return isValidate;
-    }
-    isValidate = FieldRequiredValidation(
-      CreateProductData.pack_of,
-      "Number Pack Of"
-    );
-    if (!isValidate.status) {
-      setIsValidate(isValidate.name);
-      return isValidate;
-    }
-    isValidate = FieldRequiredValidation(CreateProductData.ideal_for, "Ideal");
-    if (!isValidate.status) {
-      setIsValidate(isValidate.name);
-      return isValidate;
-    }
-
-    isValidate = FieldRequiredValidation(value, "Description");
-    if (!isValidate.status) {
-      setIsValidate(isValidate.name);
-      return isValidate;
-    }
-
-    return { status: true };
-  };
-
-  const SubmitForm = () => {
-    const msg = validation();
-    if (!msg.status) {
-      toast.error(msg.message, {
-        //position: toast.POSITION.TOP_RIGHT,
-      });
-    } else {
-      // console.log({ ...CreateProductData, product_desc: value });
+  const {
+    values,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    errors,
+    touched,
+    setFieldValue,
+  } = useFormik({
+    enableReinitialize: true,
+    initialValues: CreateProductData,
+    validationSchema: Yup.object({
+      product_title: Yup.string()
+        .required("Title is Required")
+        .min(5, "Title is too short")
+        .matches(/[^0-9]/, { message: "Can not containe only number" }),
+      pc_id: Yup.string().required("Product category is Required"),
+      pack_of: Yup.string().required("Pack Of is Required"),
+      ideal_for: Yup.string().required("Ideal for is Required"),
+      product_desc: Yup.string()
+        .test(
+          "product_desc",
+          "Product description cannot be empty",
+          (value) => {
+            const strippedValue = stripHtml(value);
+            return strippedValue.trim().length > 0;
+          }
+        )
+        .test(
+          "product_desc",
+          "Product description is too short , add at least 50 charaters",
+          (value) => {
+            const strippedValue = stripHtml(value);
+            return strippedValue.trim().length > 50;
+          }
+        ),
+    }),
+    onSubmit: async (data) => {
       if (paramValue) {
-        updateProduct({
-          ...CreateProductData,
-          product_desc: value,
+        const result = await updateProduct({
+          ...data,
+
           product_id: paramValue,
         });
+        if (result.status) {
+          navigate(`/addproduct/createvariant?product_id=${paramValue}`);
+          toast.success("Change saved");
+        } else {
+          toast.error(result.message);
+        }
       } else {
         createProduct({
-          ...CreateProductData,
-          product_desc: value,
+          ...data,
         });
       }
-    }
-  };
-
-  const CreateVarient = () => {
-    createVariant({ ...varient, product_id: product_id });
-  };
+    },
+  });
 
   return (
     <>
@@ -142,7 +131,6 @@ const CreateProduct = () => {
           <div className="col-lg-12 col-12">
             <div className="align-items-center bg-white d-flex justify-content-between mb-4 p-5 rounded-3 shadow-sm">
               <h3 className="m-0">Create Product</h3>
-              {/* <button className="btn btn-primary">Add Product</button> */}
             </div>
             <div className="card mb-4">
               <div className="card-header">
@@ -155,24 +143,33 @@ const CreateProduct = () => {
                     <input
                       type="text"
                       className={`form-control ${
-                        isValidate == "product_title" && "error-input"
+                        touched.product_title &&
+                        errors.product_title &&
+                        "error-input"
                       }`}
                       placeholder="Enter Product Title"
                       name="product_title"
-                      value={CreateProductData.product_title}
-                      onChange={handleForm}
+                      value={values.product_title}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
                     />
+                    {touched.product_title && errors.product_title && (
+                      <small className="fs-6 fw-bold text-danger">
+                        {errors.product_title}
+                      </small>
+                    )}
                   </div>
                   <div className="mb-3 col-md-6">
                     <label className="form-label">Product Category</label>
                     <select
                       className={`form-select ${
-                        isValidate == "Category" && "error-input"
+                        touched.pc_id && errors.pc_id && "error-input"
                       }`}
                       aria-label="Default select example"
                       name="pc_id"
-                      onChange={handleForm}
-                      value={CreateProductData.pc_id}
+                      value={values.pc_id}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
                     >
                       <option>Select Category</option>
                       {ProductCategory &&
@@ -184,17 +181,23 @@ const CreateProduct = () => {
                           );
                         })}
                     </select>
+                    {touched.pc_id && errors.pc_id && (
+                      <small className="fs-6 fw-bold text-danger">
+                        {errors.pc_id}
+                      </small>
+                    )}
                   </div>
                   <div className="mb-3 col-md-6">
                     <label className="form-label">Pack of</label>
                     <select
                       className={`form-select ${
-                        isValidate == "Number Pack Of" && "error-input"
+                        touched.pack_of && errors.pack_of && "error-input"
                       }`}
                       aria-label="Default select example"
                       name="pack_of"
-                      onChange={handleForm}
-                      value={CreateProductData.pack_of}
+                      onChange={handleChange}
+                      value={values.pack_of}
+                      onBlur={handleBlur}
                     >
                       <option value={""}>Select pack of</option>
                       <option value={"1"}>1</option>
@@ -202,24 +205,35 @@ const CreateProduct = () => {
                       <option value={"3"}>3</option>
                       <option value={"4"}>4</option>
                     </select>
+                    {touched.pack_of && errors.pack_of && (
+                      <small className="fs-6 fw-bold text-danger">
+                        {errors.pack_of}
+                      </small>
+                    )}
                   </div>
 
                   <div className="mb-3 col-md-6">
                     <label className="form-label">Ideal For</label>
                     <select
                       className={`form-select ${
-                        isValidate == "Ideal" && "error-input"
+                        touched.ideal_for && errors.ideal_for && "error-input"
                       }`}
                       aria-label="Default select example"
                       name="ideal_for"
-                      onChange={handleForm}
-                      value={CreateProductData.ideal_for}
+                      onChange={handleChange}
+                      value={values.ideal_for}
+                      onBlur={handleBlur}
                     >
                       <option value={""}>Select Ideal</option>
                       <option value={"male"}>Male</option>
                       <option value={"female"}>female</option>
                       <option value={"kids"}>Kids</option>
                     </select>
+                    {touched.ideal_for && errors.ideal_for && (
+                      <small className="fs-6 fw-bold text-danger">
+                        {errors.ideal_for}
+                      </small>
+                    )}
                   </div>
                 </div>
 
@@ -231,10 +245,21 @@ const CreateProduct = () => {
                   </p>
                   {/* input */}
                   <TextEditor
-                    value={value}
-                    onChange={setValue}
-                    className={isValidate == "Description" && "error-input"}
+                    value={values.product_desc}
+                    onChange={(value) => {
+                      setFieldValue("product_desc", value);
+                    }}
+                    className={
+                      touched.product_desc &&
+                      errors.product_desc &&
+                      "error-input"
+                    }
                   />
+                  {touched.product_desc && errors.product_desc && (
+                    <small className="fs-6 fw-bold text-danger">
+                      {errors.product_desc}
+                    </small>
+                  )}
                 </div>
               </div>
             </div>
@@ -242,10 +267,14 @@ const CreateProduct = () => {
         </div>
 
         <div className="d-flex justify-content-end">
-          <button onClick={SubmitForm} className="btn btn-primary">
-            Next
-            <IconPack icon={"rightarrow"} />
-          </button>
+          {loading["CREATE_PRODUCT"] ? (
+            <button className="btn btn-primary " disabled>Loading . . .</button>
+          ) : (
+            <button onClick={handleSubmit} className="btn btn-primary">
+              Next
+              <IconPack icon={"rightarrow"} />
+            </button>
+          )}
         </div>
       </div>
     </>

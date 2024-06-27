@@ -1,12 +1,15 @@
 import $ from "jquery";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { ProductContext } from "../CreateContext";
+import { GlobalContext, ProductContext } from "../CreateContext";
 
 const ProductState = ({ children }) => {
+  const { loading, setLoading } = useContext(GlobalContext);
   const url = `${import.meta.env.VITE_APP_SERVER_URL}/product`;
   const navigate = useNavigate();
+  const location = useLocation();
+  // console.log(location)
   // const [isChanges, setIsChanges] = useState(false);
   const [varientObj, setVariantObj] = useState();
   const [CreateProductData, setCreateProductData] = useState({
@@ -30,6 +33,7 @@ const ProductState = ({ children }) => {
 
   //   Create A Product
   const createProduct = async (data) => {
+    setLoading({ ...loading, CREATE_PRODUCT: true });
     try {
       const response = await fetch(`${url}/createproduct`, {
         method: "POST",
@@ -41,26 +45,28 @@ const ProductState = ({ children }) => {
       });
       const result = await response.json();
       if (result.status) {
-        navigate(`addproduct/createvariant?product_id=${result.product_id}`);
-        toast.success("Changed saved", {
-          //position: toast.POSITION.TOP_RIGHT,
+        navigate(`addproduct/createvariant?product_id=${result.product_id}`, {
+          replace: true,
         });
+        toast.success("Changed saved");
       } else {
         toast.error(result.message, {
           //position: toast.POSITION.TOP_RIGHT,
         });
       }
+      setLoading({ ...loading, CREATE_PRODUCT: false });
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
         //position: toast.POSITION.TOP_RIGHT,
       });
+      setLoading({ ...loading, CREATE_PRODUCT: false });
     }
   };
 
-
   // Create A Variant
   const createVariant = async (data, category) => {
+    setLoading({ ...loading, CREATE_VARIANT: true });
     try {
       const response = await fetch(`${url}/createvarient`, {
         method: "POST",
@@ -71,32 +77,31 @@ const ProductState = ({ children }) => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      // console.log("🚀 ~ createVariant ~ result:", result);
       if (result.status) {
-        navigate(
-          // `/addproduct/createvariant?variant_id=${result.variant_id}&product_id=${data.product_id}`
-          `/addproduct/createvariant?product_id=${data.product_id}`
-        );
-        // console.log(data)
-        // getAllVariant(data.product_id , data.color_id);
-        toast.success("New varinat added", {
-          //position: toast.POSITION.TOP_RIGHT,
+        navigate(`/addproduct/createvariant?product_id=${data.product_id}`, {
+          replace: true,
         });
+
+        toast.success("New varinat added");
+        setLoading({ ...loading, CREATE_VARIANT: false });
         return true;
       } else {
-        toast.error(result.message, {
-          //position: toast.POSITION.TOP_RIGHT,
-        });
+        toast.error(result.message);
+
+        setLoading({ ...loading, CREATE_VARIANT: false });
         return false;
       }
     } catch (error) {
       console.log(error);
+      setLoading({ ...loading, CREATE_VARIANT: false });
       return false;
+
     }
   };
 
   // Update Product
   const updateProduct = async (data) => {
+    setLoading({ ...loading, CREATE_PRODUCT: true });
     try {
       const response = await fetch(`${url}/updateproduct`, {
         method: "POST",
@@ -107,21 +112,14 @@ const ProductState = ({ children }) => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      if (result.status) {
-        navigate(`addproduct/createvariant?product_id=${data.product_id}`);
-        toast.success("Change saved", {
-          //position: toast.POSITION.TOP_RIGHT,
-        });
-      } else {
-        toast.error(result.message, {
-          //position: toast.POSITION.TOP_RIGHT,
-        });
-      }
+      setLoading({ ...loading, CREATE_PRODUCT: false });
+      return result;
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error", {
         //position: toast.POSITION.TOP_RIGHT,
       });
+      setLoading({ ...loading, CREATE_PRODUCT: false });
     }
   };
 
@@ -148,9 +146,8 @@ const ProductState = ({ children }) => {
         // });
         return result.data;
       } else {
-        toast.error(result.message, {
-          //position: toast.POSITION.TOP_RIGHT,
-        });
+        // toast.error(result.message);
+        navigate("/viewproduct");
       }
     } catch (error) {
       console.log("Error fetching data:", error.message);
@@ -160,7 +157,8 @@ const ProductState = ({ children }) => {
     }
   };
 
-  const deleteVariant = async (variant_id, product_id) => {
+  // Delete Variant
+  const deleteVariant = async (variant_id) => {
     try {
       const response = await fetch(`${url}/deleteVariant`, {
         method: "DELETE",
@@ -188,6 +186,26 @@ const ProductState = ({ children }) => {
       toast.error("Internal server error", {
         //position: toast.POSITION.TOP_RIGHT,
       });
+      return false;
+    }
+  };
+
+  // Delete Product
+  const deleteProduct = async (product_id) => {
+    try {
+      const response = await fetch(`${url}/deleteproduct`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ product_id }),
+      });
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.log("Error fetching data:", error.message);
+      toast.error("Internal server error");
       return false;
     }
   };
@@ -233,8 +251,41 @@ const ProductState = ({ children }) => {
       return false;
     }
   };
+  // Get All Varient
+  const getAllVariant = async (product_id, color_id) => {
+    setLoading({ ...loading, GET_ADD_VARIANT: true });
+    try {
+      const response = await fetch(`${url}/getallvarient`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ product_id, color_id }),
+      });
+      const result = await response.json();
+      if (result.status) {
+        setVariantObj(result.data);
+        // navigate(`/addproduct/createvariant?variant_id=${result.data[result.data.length - 1].variant_id}&product_id=${product_id}`)
+        // navigate(`/addproduct/createvariant?product_id=${product_id}`);
+        navigate(`${location.pathname}?product_id=${product_id}`);
+        setLoading({ ...loading, GET_ADD_VARIANT: false })
+        return result.data;
+      } else {
+        setVariantObj();
+        // navigate(`/addproduct/createvariant?product_id=${product_id}`);
+        navigate(`/viewproduct`);
+        setLoading({ ...loading, GET_ADD_VARIANT: false })
+      }
+    } catch (error) {
+      console.log("Error fetching data:", error.message);
+      toast.error("Internal server error");
+      setLoading({ ...loading, GET_ADD_VARIANT: false })
+    }
+  };
 
   const getProduct = async (data) => {
+    setLoading({ ...loading, GET_PRODUCT: true });
     try {
       const response = await fetch(`${url}/getproduct`, {
         method: "POST",
@@ -242,18 +293,22 @@ const ProductState = ({ children }) => {
           "Content-Type": "application/json",
           token: localStorage.getItem("token"),
         },
-        body: JSON.stringify( data ),
+        body: JSON.stringify(data),
       });
       const result = await response.json();
+
+      setLoading({ ...loading, GET_PRODUCT: false });
       return result;
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error");
+      setLoading({ ...loading, GET_PRODUCT: false });
       return false;
     }
   };
 
   const getVariant = async (data) => {
+    setLoading({ ...loading, GET_VARIANT: true });
     try {
       const response = await fetch(`${url}/getvariant`, {
         method: "POST",
@@ -261,13 +316,16 @@ const ProductState = ({ children }) => {
           "Content-Type": "application/json",
           token: localStorage.getItem("token"),
         },
-        body: JSON.stringify( data ),
+        body: JSON.stringify(data),
       });
       const result = await response.json();
+
+      setLoading({ ...loading, GET_VARIANT: false, GET_PRODUCT: false });
       return result;
     } catch (error) {
       console.log("Error fetching data:", error.message);
       toast.error("Internal server error");
+      setLoading({ ...loading, GET_VARIANT: false , GET_PRODUCT: false  });
       return false;
     }
   };
@@ -286,6 +344,8 @@ const ProductState = ({ children }) => {
     checkVariant,
     getProduct,
     getVariant,
+    getAllVariant,
+    deleteProduct,
     Variant: { varient, setVarient, handleVarientForm },
   };
   return (

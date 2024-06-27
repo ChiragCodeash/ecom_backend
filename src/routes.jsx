@@ -42,11 +42,18 @@ const routes = [
     component: CreateProduct,
     exact: true,
     title: "Create product",
-  },{
+  },
+  {
     path: "/addproduct/createvariant",
     component: AddVarient,
     exact: true,
     title: "Create Variant",
+  },
+  {
+    path: "/updatevariant",
+    component: AddVarient,
+    exact: true,
+    title: "Update Variant",
   },
 
   {

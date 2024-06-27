@@ -23,6 +23,7 @@ const CustomeModal = ({
         centered={centered || false}
         backdrop={backdrop || "static"}
         dialogClassName={{ ...dialogClassName }}
+        scrollable
       >
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>

@@ -107,7 +107,7 @@ const SidebarComponet = ({ Componets }) => {
       name: "Product",
       link: "/viewproduct",
       icon: "view",
-      active: ["/viewproduct" , "/addproduct" , "/addproduct/createvariant"],
+      active: ["/viewproduct" , "/addproduct" , "/addproduct/createvariant", "/updatevariant"],
     },
     {
       name: "Theme",
