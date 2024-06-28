@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import {
+  AttributeContext,
   GlobalContext,
   ProductCategoryContext,
   ProductContext,
@@ -25,22 +26,23 @@ const CreateProduct = () => {
     updateProduct,
     getSingalProduct,
   } = useContext(ProductContext);
+  const { fabric, style, occasion, GetAttribute } =
+    useContext(AttributeContext);
   const { GetCategory, ProductCategory } = useContext(ProductCategoryContext);
   const navigate = useNavigate();
 
   useEffect(() => {
     GetCategory();
+    GetAttribute();
     // console.log(typeof(paramValue))
     if (paramValue) {
       const fetch = async () => {
-        const { pc_id, product_title, product_desc, pack_of, ideal_for } =
+        const { pc_id, product_title, product_desc, fabric, style , occasion } =
           await getSingalProduct(paramValue);
         setCreateProductData({
           pc_id,
           product_title,
-          product_desc,
-          pack_of,
-          ideal_for,
+          product_desc,fabric, style , occasion
         });
       };
       fetch();
@@ -82,9 +84,10 @@ const CreateProduct = () => {
         .required("Title is Required")
         .min(5, "Title is too short")
         .matches(/[^0-9]/, { message: "Can not containe only number" }),
-      pc_id: Yup.string().required("Product category is Required"),
-      pack_of: Yup.string().required("Pack Of is Required"),
-      ideal_for: Yup.string().required("Ideal for is Required"),
+      pc_id: Yup.string().required("Product category is required"),
+      fabric: Yup.string().required("Product fabric is required"),
+      occasion: Yup.string().required("Product occasion is required"),
+      style: Yup.string().required("Product style is required"),
       product_desc: Yup.string()
         .test(
           "product_desc",
@@ -187,54 +190,102 @@ const CreateProduct = () => {
                       </small>
                     )}
                   </div>
+                
                   <div className="mb-3 col-md-6">
-                    <label className="form-label">Pack of</label>
+                    <label className="form-label">Fabric</label>
                     <select
-                      className={`form-select ${
-                        touched.pack_of && errors.pack_of && "error-input"
+                      className={`form-select text-capitalize ${
+                        touched.fabric && errors.fabric && "error-input"
                       }`}
-                      aria-label="Default select example"
-                      name="pack_of"
+                      name="fabric"
                       onChange={handleChange}
-                      value={values.pack_of}
+                      value={values.fabric}
                       onBlur={handleBlur}
                     >
-                      <option value={""}>Select pack of</option>
-                      <option value={"1"}>1</option>
-                      <option value={"2"}>2</option>
-                      <option value={"3"}>3</option>
-                      <option value={"4"}>4</option>
+                       <option value={""}>Select Fabric</option>
+                      {fabric &&
+                        fabric.map((fabric, i) => {
+                          return (
+                            <option
+                              value={fabric.id}
+                              key={i}
+                              className="text-capitalize"
+                            >
+                              {fabric.name}
+                            </option>
+                          );
+                        })}
                     </select>
-                    {touched.pack_of && errors.pack_of && (
+                    {touched.fabric && errors.fabric && (
                       <small className="fs-6 fw-bold text-danger">
-                        {errors.pack_of}
+                        {errors.fabric}
+                      </small>
+                    )}
+                  </div>
+                  <div className="mb-3 col-md-6">
+                    <label className="form-label">Occasion</label>
+                    <select
+                      className={`form-select text-capitalize ${
+                        touched.occasion && errors.occasion && "error-input"
+                      }`}
+                      name="occasion"
+                      onChange={handleChange}
+                      value={values.occasion}
+                      onBlur={handleBlur}
+                    >
+                       <option value={""}>Select Occasion</option>
+                      {occasion &&
+                        occasion.map((occasion, i) => {
+                          return (
+                            <option
+                              value={occasion.id}
+                              key={i}
+                              className="text-capitalize"
+                            >
+                              {occasion.name}
+                            </option>
+                          );
+                        })}
+                    </select>
+                    {touched.occasion && errors.occasion && (
+                      <small className="fs-6 fw-bold text-danger">
+                        {errors.occasion}
+                      </small>
+                    )}
+                  </div>
+                  <div className="mb-3 col-md-6">
+                    <label className="form-label">Style</label>
+                    <select
+                      className={`form-select text-capitalize ${
+                        touched.style && errors.style && "error-input"
+                      }`}
+                      name="style"
+                      onChange={handleChange}
+                      value={values.style}
+                      onBlur={handleBlur}
+                    >
+                       <option value={""}>Select Style</option>
+                      {style &&
+                        style.map((style, i) => {
+                          return (
+                            <option
+                              value={style.id}
+                              key={i}
+                              className="text-capitalize"
+                            >
+                              {style.name}
+                            </option>
+                          );
+                        })}
+                    </select>
+                    {touched.style && errors.style && (
+                      <small className="fs-6 fw-bold text-danger">
+                        {errors.style}
                       </small>
                     )}
                   </div>
 
-                  <div className="mb-3 col-md-6">
-                    <label className="form-label">Ideal For</label>
-                    <select
-                      className={`form-select ${
-                        touched.ideal_for && errors.ideal_for && "error-input"
-                      }`}
-                      aria-label="Default select example"
-                      name="ideal_for"
-                      onChange={handleChange}
-                      value={values.ideal_for}
-                      onBlur={handleBlur}
-                    >
-                      <option value={""}>Select Ideal</option>
-                      <option value={"male"}>Male</option>
-                      <option value={"female"}>female</option>
-                      <option value={"kids"}>Kids</option>
-                    </select>
-                    {touched.ideal_for && errors.ideal_for && (
-                      <small className="fs-6 fw-bold text-danger">
-                        {errors.ideal_for}
-                      </small>
-                    )}
-                  </div>
+                  
                 </div>
 
                 <div>
@@ -268,7 +319,9 @@ const CreateProduct = () => {
 
         <div className="d-flex justify-content-end">
           {loading["CREATE_PRODUCT"] ? (
-            <button className="btn btn-primary " disabled>Loading . . .</button>
+            <button className="btn btn-primary " disabled>
+              Loading . . .
+            </button>
           ) : (
             <button onClick={handleSubmit} className="btn btn-primary">
               Next

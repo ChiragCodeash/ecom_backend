@@ -68,7 +68,7 @@ const DataTable = ({ col, data, isLoading, actions, unique }) => {
                                         colData.actions && "pointer"
                                       }`}
                                       width={64}
-                                      height={48}
+                                      height={64}
                                       onClick={() => {
                                         colData.actions &&
                                           colData.actions["onclick"]();

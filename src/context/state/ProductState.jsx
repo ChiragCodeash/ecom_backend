@@ -16,8 +16,9 @@ const ProductState = ({ children }) => {
     pc_id: "",
     product_title: "",
     product_desc: "",
-    ideal_for: "",
-    pack_of: "",
+    fabric: "",
+    occasion: "",
+    style: "",
   });
   const [varient, setVarient] = useState({
     size_id: "",

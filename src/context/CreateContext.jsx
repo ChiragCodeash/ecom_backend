@@ -8,4 +8,5 @@ export const ProductContext = createContext();
 export const ColorContext = createContext();
 export const SizeContext = createContext();
 export const ColorAndSizeContext = createContext();
+export const AttributeContext = createContext();
 export const ImageContext = createContext();

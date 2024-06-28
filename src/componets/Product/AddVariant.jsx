@@ -8,7 +8,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import {
-  ColorAndSizeContext,
+  AttributeContext,
   GlobalContext,
   ImageContext,
   ProductContext,
@@ -43,7 +43,7 @@ const AddVarient = () => {
   const { varient, handleVarientForm, setVarient } =
     useContext(ProductContext).Variant;
   const { getColorAndSize, sizeAndColor, addColor, addSize } =
-    useContext(ColorAndSizeContext);
+    useContext(AttributeContext);
   const { addImage, deleteImage, updateImage } = useContext(ImageContext);
 
   // State --------------

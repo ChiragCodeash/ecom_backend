@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import {
+  AttributeContext,
   GlobalContext,
   ProductCategoryContext,
   ProductContext,
@@ -28,24 +29,24 @@ const SingleProductList = ({
       // onClick={() => {
       //   onClick(data.product_id);
       // }}
-      className={`d-block pointer mb-2 p-2 rounded-3 ${
+      className={`d-block pointer mb-2 p-2 border rounded-3 ${
         active ? "bg-gray-100" : ""
       }`}
     >
-      <div className="d-flex align-items-center ">
+      <div className="d-flex  align-items-center">
         <img
           src={data.image_array}
           alt="Image"
           className="img-4by3-lg rounded-3"
-          width={104}
-          height={104}
+          width={130}
+          height={130}
           onClick={() => {
             onClick(data.product_id);
           }}
         />
-        <div className="ms-4">
+        <div className="ms-4 w-100">
           <h5
-            className="mb-0"
+            className="mb-0 mb-2 fs-4"
             onClick={() => {
               onClick(data.product_id);
             }}
@@ -54,7 +55,63 @@ const SingleProductList = ({
               ? data.product_title.slice(0, 60).concat("...")
               : data.product_title}
           </h5>
-          <div className="row g-2">
+          <div className="row">
+            <div className="col-4 mb-2">
+              <h5 className="text-uppercase mb-0">Category</h5>
+              <p className="mb-0 fs-6 text-capitalize">{data.category_name}</p>
+            </div>
+            <div className="col-4 mb-2">
+              <h5 className="text-uppercase mb-0">Fabric</h5>
+              <p className="mb-0 fs-6 text-capitalize">{data.fabric_name}</p>
+            </div>
+            <div className="col-4">
+              <h5 className="text-uppercase mb-0">Style</h5>
+              <p className="mb-0 fs-6 text-capitalize">{data.style_name}</p>
+            </div>
+            <div className="col-4">
+              <h5 className="text-uppercase mb-0">Occasion</h5>
+              <p className="mb-0 fs-6 text-capitalize">{data.occasion_name}</p>
+            </div>
+            <div className="col-4">
+              <h5 className="text-uppercase mb-0">Status</h5>
+              <p className="mb-0 fs-6 text-capitalize">
+                {" "}
+                {data.draft ? (
+                  <span className="badge badge-secondary-soft text-capitalize">
+                    Draft
+                  </span>
+                ) : data.status ? (
+                  <span className="badge badge-success-soft text-capitalize">
+                    Active
+                  </span>
+                ) : (
+                  <span className="badge badge-danger-soft text-capitalize">
+                    Deactive
+                  </span>
+                )}
+              </p>
+            </div>
+            <div className="col-4">
+            <button
+              className="btn btn-light-soft p-1 text-dark"
+              onClick={() => {
+                handleUpdate(data.product_id, data);
+              }}
+            >
+              <IconPack icon={"edit"} className={" pointer"} />
+            </button>
+            <button
+              className="btn btn-light-soft p-1 text-dark"
+              onClick={() => {
+                handleDelete(data.product_id);
+              }}
+            >
+              <IconPack icon={"trash"} className={" pointer"} />
+            </button>
+            </div>
+          </div>
+
+          {/* <div className="row g-2">
             <small className="text-muted col-6 ">
               Category: <span className="fw-bold">{data.category_name}</span>
             </small>
@@ -78,24 +135,9 @@ const SingleProductList = ({
                 </span>
               )}
             </small>
-          </div>
+          </div> */}
           <div className="d-flex gap-1 mt-2">
-            <button
-              className="btn btn-light-soft p-1 text-dark"
-              onClick={() => {
-                handleUpdate(data.product_id, data);
-              }}
-            >
-              <IconPack icon={"edit"} className={" pointer"} />
-            </button>
-            <button
-              className="btn btn-light-soft p-1 text-dark"
-              onClick={() => {
-                handleDelete(data.product_id);
-              }}
-            >
-              <IconPack icon={"trash"} className={" pointer"} />
-            </button>
+          
           </div>
         </div>
       </div>
@@ -105,6 +147,8 @@ const SingleProductList = ({
 
 const ViewProduct = () => {
   const { loading } = useContext(GlobalContext);
+  const { fabric, style, occasion, GetAttribute } =
+    useContext(AttributeContext);
   // console.log("loading==>" , loading["GET_PRODUCT"])
   const navigate = useNavigate();
   const { GetCategory, ProductCategory } = useContext(ProductCategoryContext);
@@ -152,8 +196,9 @@ const ViewProduct = () => {
     pc_id: "",
     product_title: "",
     product_desc: "",
-    ideal_for: "",
-    pack_of: "",
+    fabric: "",
+    occasion: "",
+    style: "",
     status: "",
   });
 
@@ -189,25 +234,27 @@ const ViewProduct = () => {
     setTempId(undefined);
     setProductUpdateMD(false);
     setNewProductData({
-      pc_id: "",
       product_title: "",
       product_desc: "",
       ideal_for: "",
-      pack_of: "",
       status: "",
+      fabric: "",
+      occasion: "",
+      style: "",
     });
   };
   const HandleShowProductUpdateMD = (
     id,
-    { pack_of, product_desc, pc_id, ideal_for, product_title, status }
+    { product_desc, pc_id, fabric, occasion, style, product_title, status }
   ) => {
     setNewProductData({
-      pack_of,
       product_desc,
       pc_id,
-      ideal_for,
       product_title,
       status,
+      fabric,
+      occasion,
+      style,
     });
     setDescription(product_desc);
     setTempId(id);
@@ -272,6 +319,7 @@ const ViewProduct = () => {
 
   useEffect(() => {
     GetCategory();
+    GetAttribute();
   }, []);
 
   const col = [
@@ -481,8 +529,9 @@ const ViewProduct = () => {
         .min(5, "Title is too short")
         .matches(/[^0-9]/, { message: "Can not containe only number" }),
       pc_id: Yup.string().required("Product category is Required"),
-      pack_of: Yup.string().required("Pack Of is Required"),
-      ideal_for: Yup.string().required("Ideal for is Required"),
+      fabric: Yup.string().required("Product fabric is required"),
+      occasion: Yup.string().required("Product occasion is required"),
+      style: Yup.string().required("Product style is required"),
       status: Yup.number().required("Status for is Required"),
       product_desc: Yup.string()
         .test(
@@ -605,7 +654,7 @@ const ViewProduct = () => {
 
       <div className="row">
         <div className="col-4">
-          <div className="card h-100">
+          <div className="card">
             <div className="card-header p-5 ">
               <h4 className="mb-0">Product</h4>
             </div>
@@ -757,7 +806,7 @@ const ViewProduct = () => {
               </small>
             )}
           </div>
-          <div className="mb-3 col-md-6">
+          {/* <div className="mb-3 col-md-6">
             <label className="form-label">Pack of</label>
             <select
               className={`form-select `}
@@ -777,28 +826,96 @@ const ViewProduct = () => {
                 {UpdateProduct.errors.pack_of}
               </small>
             )}
-          </div>
+          </div> */}
           <div className="mb-3 col-md-6">
-            <label className="form-label">Ideal For</label>
+            <label className="form-label">Fabric</label>
             <select
-              className={`form-select `}
+              className={`form-select text-capitalize `}
               aria-label="Default select example"
-              name="ideal_for"
+              name="fabric"
               onChange={UpdateProduct.handleChange}
-              value={UpdateProduct.values.ideal_for}
+              value={UpdateProduct.values.fabric}
               onBlur={UpdateProduct.handleBlur}
             >
-              <option value={"male"}>Male</option>
-              <option value={"female"}>Female</option>
-              <option value={"kids"}>Kids</option>
+              {fabric &&
+                fabric.map((fabric, i) => {
+                  return (
+                    <option
+                      value={fabric.id}
+                      key={i}
+                      className="text-capitalize"
+                    >
+                      {fabric.name}
+                    </option>
+                  );
+                })}
             </select>
-            {UpdateProduct.touched.ideal_for &&
-              UpdateProduct.errors.ideal_for && (
+            {UpdateProduct.touched.fabric && UpdateProduct.errors.fabric && (
+              <small className="fs-6 fw-bold text-danger">
+                {UpdateProduct.errors.fabric}
+              </small>
+            )}
+          </div>
+          <div className="mb-3 col-md-6">
+            <label className="form-label">Occasion</label>
+            <select
+              className={`form-select text-capitalize`}
+              aria-label="Default select example"
+              name="occasion"
+              onChange={UpdateProduct.handleChange}
+              value={UpdateProduct.values.occasion}
+              onBlur={UpdateProduct.handleBlur}
+            >
+              {occasion &&
+                occasion.map((occasion, i) => {
+                  return (
+                    <option
+                      value={occasion.id}
+                      key={i}
+                      className="text-capitalize"
+                    >
+                      {occasion.name}
+                    </option>
+                  );
+                })}
+            </select>
+            {UpdateProduct.touched.occasion &&
+              UpdateProduct.errors.occasion && (
                 <small className="fs-6 fw-bold text-danger">
-                  {UpdateProduct.errors.ideal_for}
+                  {UpdateProduct.errors.occasion}
                 </small>
               )}
           </div>
+          <div className="mb-3 col-md-6">
+            <label className="form-label">Style</label>
+            <select
+              className={`form-select text-capitalize `}
+              aria-label="Default select example"
+              name="style"
+              onChange={UpdateProduct.handleChange}
+              value={UpdateProduct.values.style}
+              onBlur={UpdateProduct.handleBlur}
+            >
+              {style &&
+                style.map((style, i) => {
+                  return (
+                    <option
+                      value={style.id}
+                      key={i}
+                      className="text-capitalize"
+                    >
+                      {style.name}
+                    </option>
+                  );
+                })}
+            </select>
+            {UpdateProduct.touched.style && UpdateProduct.errors.style && (
+              <small className="fs-6 fw-bold text-danger">
+                {UpdateProduct.errors.style}
+              </small>
+            )}
+          </div>
+
           <div className="mb-3 col-md-6">
             <label className="form-label">Status</label>
             <select

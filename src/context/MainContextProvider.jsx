@@ -4,8 +4,7 @@ import ThemeState from "./state/ThemeState";
 import AuthState from "./state/AuthState";
 import ProductCategoryState from "./state/ProductCategoryState";
 import ProductState from "./state/ProductState";
-import SizeState from "./state/SizeState";
-import ColorAndSizeState from "./state/ColorAndSizeState";
+import AttributeState from "./state/AttributeState";
 import ImageState from "./state/ImageState";
 
 const MainContextProvider = ({ children }) => {
@@ -16,9 +15,7 @@ const MainContextProvider = ({ children }) => {
           <ProductCategoryState>
             <ProductState>
               <ImageState>
-                <SizeState>
-                  <ColorAndSizeState>{children}</ColorAndSizeState>
-                </SizeState>
+                  <AttributeState>{children}</AttributeState>
               </ImageState>
             </ProductState>
           </ProductCategoryState>

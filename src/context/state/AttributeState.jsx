@@ -1,13 +1,17 @@
 import React, { Children, useState } from "react";
-import { ColorAndSizeContext } from "../CreateContext";
+import { AttributeContext } from "../CreateContext";
 import { toast } from "react-toastify";
 
-const ColorAndSizeState = ({ children }) => {
+const AttributeState = ({ children }) => {
   const [productColor, setProductColor] = useState();
   const [productSize, setProductSize] = useState();
   const [sizeAndColor, setSizeAndColor] = useState();
+  const [fabric, setFabric] = useState();
+  const [occasion, setOccasion] = useState();
+  const [style, setStyle] = useState();
 
-  const url = `${import.meta.env.VITE_APP_SERVER_URL}/colorandsize`;
+  // const url = `${import.meta.env.VITE_APP_SERVER_URL}/colorandsize`;
+  const url = `${import.meta.env.VITE_APP_SERVER_URL}/attributes`;
 
   const getColor = async () => {
     try {
@@ -138,6 +142,27 @@ const ColorAndSizeState = ({ children }) => {
     }
   };
 
+  const GetAttribute = async () => {
+    try {
+      const response = await fetch(`${url}/getattribute`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+      });
+      const result = await response.json();
+      if (result.status) {
+        setFabric(result.data["fabric"]);
+        setStyle(result.data["style"]);
+        setOccasion(result.data["occasion"]);
+      }
+    } catch (error) {
+      console.log("Error fetching data:", error.message);
+      toast.error("Internal server error");
+    }
+  };
+
   const DefaultObj = {
     getColor,
     productColor,
@@ -145,13 +170,18 @@ const ColorAndSizeState = ({ children }) => {
     productSize,
     getColorAndSize,
     sizeAndColor,
-    addColor,addSize
+    addColor,
+    addSize,
+    GetAttribute,
+    fabric,
+    style,
+    occasion,
   };
   return (
-    <ColorAndSizeContext.Provider value={DefaultObj}>
+    <AttributeContext.Provider value={DefaultObj}>
       {children}
-    </ColorAndSizeContext.Provider>
+    </AttributeContext.Provider>
   );
 };
 
-export default ColorAndSizeState;
+export default AttributeState;
