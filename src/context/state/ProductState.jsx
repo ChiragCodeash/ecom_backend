@@ -135,6 +135,7 @@ const ProductState = ({ children }) => {
         },
       });
       const result = await response.json();
+      
       if (result.status) {
         // const { pc_id, product_title, product_desc, pack_of, ideal_for } =
         //   result.data;
